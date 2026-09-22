@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Online Bookstore API - Test Execution Report</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --panel: #ffffff; --ink: #14181f; --muted: #5b6472;
+    --line: #e3e6ea; --pass: #1a7f45; --fail: #c62828; --skip: #b26a00;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 32px 16px; background: var(--bg); color: var(--ink);
+         font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 1100px; margin: 0 auto; }
+  h1 { font-size: 24px; margin: 0 0 4px; }
+  .when { color: var(--muted); margin: 0 0 24px; font-size: 13px; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 24px; }
+  .tile { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+  .tile .label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+  .tile .value { font-size: 28px; font-weight: 650; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  table { width: 100%; border-collapse: collapse; background: var(--panel);
+          border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .06em;
+       color: var(--muted); padding: 12px 14px; border-bottom: 1px solid var(--line); }
+  td { padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  tr:last-child td { border-bottom: 0; }
+  code { font: 13px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .status { font-weight: 650; white-space: nowrap; }
+  .PASS { color: var(--pass); } .FAIL { color: var(--fail); }
+  .SKIP, .FLAKY { color: var(--skip); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--muted); }
+  .why { color: var(--fail); font-size: 13px; margin-top: 6px; white-space: pre-wrap; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #0f1216; --panel: #171b21; --ink: #e8eaed; --muted: #9aa4b2;
+            --line: #262b33; --pass: #4ade80; --fail: #f87171; --skip: #fbbf24; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>Online Bookstore API &mdash; Test Execution Report</h1>
+  <p class="when">Executed at 2026-09-22 15:04:47</p>
+  <section class="tiles">
+    <div class="tile"><div class="label">Total</div><div class="value">99</div></div>
+    <div class="tile"><div class="label">Passed</div><div class="value PASS">99</div></div>
+    <div class="tile"><div class="label">Flaky</div><div class="value FLAKY">0</div></div>
+    <div class="tile"><div class="label">Failed</div><div class="value FAIL">0</div></div>
+    <div class="tile"><div class="label">Skipped</div><div class="value SKIP">0</div></div>
+    <div class="tile"><div class="label">Pass rate</div><div class="value">100.0%</div></div>
+    <div class="tile"><div class="label">Elapsed</div><div class="value">10.7s</div>
+      <div class="label" style="margin-top:6px">32.6s cumulative</div></div>
+  </section>
+  <table>
+    <thead><tr><th>Status</th><th>Test case</th><th>Scenario</th><th class="num">Attempts</th><th class="num">Duration</th></tr></thead>
+    <tbody>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_01_GetAllAuthors</code><br><code>anUnsupportedMethodIsRefused</code></td>
+  <td>A method the resource does not support is refused with 405</td>
+  <td class="num">1</td>
+  <td class="num">238ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_01_GetAllAuthors</code><br><code>authorIdsAreUnique</code></td>
+  <td>Every author is listed under their own id</td>
+  <td class="num">1</td>
+  <td class="num">327ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_01_GetAllAuthors</code><br><code>everyAttributionIsWithinTheCatalogueRange</code></td>
+  <td>The collection reports every author's book attribution within the catalogue range</td>
+  <td class="num">1</td>
+  <td class="num">325ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_01_GetAllAuthors</code><br><code>everyAuthorIsAttributedToAnExistingBook</code></td>
+  <td>Every author is attributed to a book id that exists in the catalogue</td>
+  <td class="num">1</td>
+  <td class="num">712ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_01_GetAllAuthors</code><br><code>theAuthorListIsReturnedAsJson</code></td>
+  <td>The author list is returned as a JSON collection of well-formed authors</td>
+  <td class="num">1</td>
+  <td class="num">351ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_01_GetAllAuthors</code><br><code>theAuthorListIsStableAcrossCalls</code></td>
+  <td>Reading the list twice in a row returns a collection of the same shape</td>
+  <td class="num">1</td>
+  <td class="num">651ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_02_GetAuthorById</code><br><code>aNonIntegerIdIsRejected</code></td>
+  <td>An id that is not an integer is rejected as a bad request<br><code>[' ']</code></td>
+  <td class="num">1</td>
+  <td class="num">236ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_02_GetAuthorById</code><br><code>aNonIntegerIdIsRejected</code></td>
+  <td>An id that is not an integer is rejected as a bad request<br><code>['1.5']</code></td>
+  <td class="num">1</td>
+  <td class="num">246ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_02_GetAuthorById</code><br><code>aNonIntegerIdIsRejected</code></td>
+  <td>An id that is not an integer is rejected as a bad request<br><code>['2147483648']</code></td>
+  <td class="num">1</td>
+  <td class="num">236ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_02_GetAuthorById</code><br><code>aNonIntegerIdIsRejected</code></td>
+  <td>An id that is not an integer is rejected as a bad request<br><code>['abc']</code></td>
+  <td class="num">1</td>
+  <td class="num">239ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_02_GetAuthorById</code><br><code>aSeededAuthorIsReturned</code></td>
+  <td>Each seeded author can be fetched by their id<br><code>['1']</code></td>
+  <td class="num">1</td>
+  <td class="num">242ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_02_GetAuthorById</code><br><code>aSeededAuthorIsReturned</code></td>
+  <td>Each seeded author can be fetched by their id<br><code>['100']</code></td>
+  <td class="num">1</td>
+  <td class="num">235ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_02_GetAuthorById</code><br><code>aSeededAuthorIsReturned</code></td>
+  <td>Each seeded author can be fetched by their id<br><code>['200']</code></td>
+  <td class="num">1</td>
+  <td class="num">245ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_02_GetAuthorById</code><br><code>aSeededAuthorIsReturned</code></td>
+  <td>Each seeded author can be fetched by their id<br><code>['50']</code></td>
+  <td class="num">1</td>
+  <td class="num">238ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_02_GetAuthorById</code><br><code>anExistingAuthorIsReturned</code></td>
+  <td>An existing author is returned in full</td>
+  <td class="num">1</td>
+  <td class="num">238ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_02_GetAuthorById</code><br><code>anUnknownIdIsNotFound</code></td>
+  <td>An id that matches no author is reported as not found<br><code>['-1']</code></td>
+  <td class="num">1</td>
+  <td class="num">237ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_02_GetAuthorById</code><br><code>anUnknownIdIsNotFound</code></td>
+  <td>An id that matches no author is reported as not found<br><code>['0']</code></td>
+  <td class="num">1</td>
+  <td class="num">238ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_02_GetAuthorById</code><br><code>anUnknownIdIsNotFound</code></td>
+  <td>An id that matches no author is reported as not found<br><code>['2147483647']</code></td>
+  <td class="num">1</td>
+  <td class="num">240ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_02_GetAuthorById</code><br><code>anUnknownIdIsNotFound</code></td>
+  <td>An id that matches no author is reported as not found<br><code>['999999']</code></td>
+  <td class="num">1</td>
+  <td class="num">236ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_03_CreateAuthor</code><br><code>aNullNonNullableFieldIsRejected</code></td>
+  <td>Each non-nullable field is rejected on its own when sent as null<br><code>['id', '{"id":null,"idBook":1,"firstName":"Ada","lastName":"Lovelace"}']</code></td>
+  <td class="num">1</td>
+  <td class="num">242ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_03_CreateAuthor</code><br><code>aNullNonNullableFieldIsRejected</code></td>
+  <td>Each non-nullable field is rejected on its own when sent as null<br><code>['idBook', '{"id":1,"idBook":null,"firstName":"Ada","lastName":"Lovelace"}']</code></td>
+  <td class="num">1</td>
+  <td class="num">239ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_03_CreateAuthor</code><br><code>aPayloadWithWrongFieldTypesIsRejected</code></td>
+  <td>A payload whose field types do not match the schema is rejected<br><code>['a non-numeric book reference', '{"id":1,"idBook":"one","firstName":"Ada"}', '$.idBook']</code></td>
+  <td class="num">1</td>
+  <td class="num">241ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_03_CreateAuthor</code><br><code>aPayloadWithWrongFieldTypesIsRejected</code></td>
+  <td>A payload whose field types do not match the schema is rejected<br><code>['a non-numeric id', '{"id":"abc","idBook":1,"firstName":"Ada"}', '$.id']</code></td>
+  <td class="num">1</td>
+  <td class="num">240ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_03_CreateAuthor</code><br><code>aPayloadWithWrongFieldTypesIsRejected</code></td>
+  <td>A payload whose field types do not match the schema is rejected<br><code>['a numeric first name', '{"id":1,"idBook":1,"firstName":{}}', '$.firstName']</code></td>
+  <td class="num">1</td>
+  <td class="num">248ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_03_CreateAuthor</code><br><code>aValidAuthorIsAccepted</code></td>
+  <td>A valid author is accepted and echoed back unchanged</td>
+  <td class="num">1</td>
+  <td class="num">244ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_03_CreateAuthor</code><br><code>anAuthorMayReferenceABookThatDoesNotExist</code></td>
+  <td>Finding: an author may be attributed to a book that does not exist</td>
+  <td class="num">1</td>
+  <td class="num">241ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_03_CreateAuthor</code><br><code>anEmptyJsonObjectIsFilledWithDefaults</code></td>
+  <td>An empty JSON object is accepted and filled with type defaults rather than rejected</td>
+  <td class="num">1</td>
+  <td class="num">258ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_03_CreateAuthor</code><br><code>anUnsupportedMediaTypeIsRefused</code></td>
+  <td>A body sent under a media type the API does not accept is refused<br><code>['XML', 'application/xml']</code></td>
+  <td class="num">1</td>
+  <td class="num">238ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_03_CreateAuthor</code><br><code>anUnsupportedMediaTypeIsRefused</code></td>
+  <td>A body sent under a media type the API does not accept is refused<br><code>['plain text', 'text/plain']</code></td>
+  <td class="num">1</td>
+  <td class="num">241ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_03_CreateAuthor</code><br><code>anUnusableBodyIsRejected</code></td>
+  <td>A body that is not an author object is rejected<br><code>['a bare string', '"just a string"']</code></td>
+  <td class="num">1</td>
+  <td class="num">234ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_03_CreateAuthor</code><br><code>anUnusableBodyIsRejected</code></td>
+  <td>A body that is not an author object is rejected<br><code>['an empty body', '']</code></td>
+  <td class="num">1</td>
+  <td class="num">236ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_03_CreateAuthor</code><br><code>anUnusableBodyIsRejected</code></td>
+  <td>A body that is not an author object is rejected<br><code>['truncated JSON', '{"id":']</code></td>
+  <td class="num">1</td>
+  <td class="num">235ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_03_CreateAuthor</code><br><code>oversizedTextIsAcceptedWithoutTruncation</code></td>
+  <td>Names far longer than the seeded data are accepted without truncation</td>
+  <td class="num">1</td>
+  <td class="num">245ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_03_CreateAuthor</code><br><code>theCreatedAuthorIsNotRetrievable</code></td>
+  <td>An author accepted by POST cannot be read back, because the demo API keeps no state</td>
+  <td class="num">1</td>
+  <td class="num">481ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_04_UpdateAuthor</code><br><code>anExistingAuthorIsUpdated</code></td>
+  <td>An existing author is updated and the new version is echoed back</td>
+  <td class="num">1</td>
+  <td class="num">265ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_04_UpdateAuthor</code><br><code>anUpdateToANonIntegerIdIsRejected</code></td>
+  <td>An update addressed to a non-integer id is rejected as a bad request<br><code>['1.5']</code></td>
+  <td class="num">1</td>
+  <td class="num">240ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_04_UpdateAuthor</code><br><code>anUpdateToANonIntegerIdIsRejected</code></td>
+  <td>An update addressed to a non-integer id is rejected as a bad request<br><code>['2147483648']</code></td>
+  <td class="num">1</td>
+  <td class="num">235ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_04_UpdateAuthor</code><br><code>anUpdateToANonIntegerIdIsRejected</code></td>
+  <td>An update addressed to a non-integer id is rejected as a bad request<br><code>['abc']</code></td>
+  <td class="num">1</td>
+  <td class="num">238ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_04_UpdateAuthor</code><br><code>anUpdateWithWrongFieldTypesIsRejected</code></td>
+  <td>An update whose field types do not match the schema is rejected</td>
+  <td class="num">1</td>
+  <td class="num">232ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_04_UpdateAuthor</code><br><code>theBodyIdWinsOverThePathId</code></td>
+  <td>When the id in the path and the id in the body disagree, the body wins</td>
+  <td class="num">1</td>
+  <td class="num">243ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_04_UpdateAuthor</code><br><code>theUpdateIsNotPersisted</code></td>
+  <td>An update is not persisted, because the demo API keeps no state</td>
+  <td class="num">1</td>
+  <td class="num">735ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_04_UpdateAuthor</code><br><code>updatingAnUnknownAuthorIsAccepted</code></td>
+  <td>Updating an id that matches no author is accepted rather than reported as not found</td>
+  <td class="num">1</td>
+  <td class="num">239ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_05_DeleteAuthor</code><br><code>aDeletionOfANonIntegerIdIsRejected</code></td>
+  <td>A deletion addressed to a non-integer id is rejected as a bad request<br><code>['1.5']</code></td>
+  <td class="num">1</td>
+  <td class="num">239ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_05_DeleteAuthor</code><br><code>aDeletionOfANonIntegerIdIsRejected</code></td>
+  <td>A deletion addressed to a non-integer id is rejected as a bad request<br><code>['2147483648']</code></td>
+  <td class="num">1</td>
+  <td class="num">236ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_05_DeleteAuthor</code><br><code>aDeletionOfANonIntegerIdIsRejected</code></td>
+  <td>A deletion addressed to a non-integer id is rejected as a bad request<br><code>['abc']</code></td>
+  <td class="num">1</td>
+  <td class="num">238ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_05_DeleteAuthor</code><br><code>anExistingAuthorIsDeleted</code></td>
+  <td>Deleting an existing author is acknowledged with an empty body</td>
+  <td class="num">1</td>
+  <td class="num">241ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_05_DeleteAuthor</code><br><code>deletingAnUnknownIdIsAccepted</code></td>
+  <td>Deleting an id that matches no author is acknowledged rather than reported as not found</td>
+  <td class="num">1</td>
+  <td class="num">244ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_AUTHORS_05_DeleteAuthor</code><br><code>theDeletionIsNotPersisted</code></td>
+  <td>A deletion is not persisted, because the demo API keeps no state</td>
+  <td class="num">1</td>
+  <td class="num">493ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_01_GetAllBooks</code><br><code>anUnsupportedMethodIsRefused</code></td>
+  <td>A method the resource does not support is refused with 405</td>
+  <td class="num">1</td>
+  <td class="num">1148ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_01_GetAllBooks</code><br><code>bookIdsAreUnique</code></td>
+  <td>Every book in the catalogue is listed under its own id</td>
+  <td class="num">1</td>
+  <td class="num">424ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_01_GetAllBooks</code><br><code>theCatalogueIsReturnedAsJson</code></td>
+  <td>The catalogue is returned as a JSON collection of well-formed books</td>
+  <td class="num">1</td>
+  <td class="num">740ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_01_GetAllBooks</code><br><code>theCatalogueIsStableAcrossCalls</code></td>
+  <td>Reading the catalogue twice in a row returns the same books</td>
+  <td class="num">1</td>
+  <td class="num">798ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_02_GetBookById</code><br><code>aNonIntegerIdIsRejected</code></td>
+  <td>An id that is not an integer is rejected as a bad request<br><code>[' ']</code></td>
+  <td class="num">1</td>
+  <td class="num">259ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_02_GetBookById</code><br><code>aNonIntegerIdIsRejected</code></td>
+  <td>An id that is not an integer is rejected as a bad request<br><code>['1.5']</code></td>
+  <td class="num">1</td>
+  <td class="num">242ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_02_GetBookById</code><br><code>aNonIntegerIdIsRejected</code></td>
+  <td>An id that is not an integer is rejected as a bad request<br><code>['2147483648']</code></td>
+  <td class="num">1</td>
+  <td class="num">247ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_02_GetBookById</code><br><code>aNonIntegerIdIsRejected</code></td>
+  <td>An id that is not an integer is rejected as a bad request<br><code>['abc']</code></td>
+  <td class="num">1</td>
+  <td class="num">1169ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_02_GetBookById</code><br><code>aSeededBookIsReturned</code></td>
+  <td>Each book of the seeded catalogue can be fetched by its id<br><code>['1']</code></td>
+  <td class="num">1</td>
+  <td class="num">267ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_02_GetBookById</code><br><code>aSeededBookIsReturned</code></td>
+  <td>Each book of the seeded catalogue can be fetched by its id<br><code>['100']</code></td>
+  <td class="num">1</td>
+  <td class="num">245ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_02_GetBookById</code><br><code>aSeededBookIsReturned</code></td>
+  <td>Each book of the seeded catalogue can be fetched by its id<br><code>['200']</code></td>
+  <td class="num">1</td>
+  <td class="num">250ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_02_GetBookById</code><br><code>aSeededBookIsReturned</code></td>
+  <td>Each book of the seeded catalogue can be fetched by its id<br><code>['50']</code></td>
+  <td class="num">1</td>
+  <td class="num">247ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_02_GetBookById</code><br><code>anExistingBookIsReturned</code></td>
+  <td>An existing book is returned in full</td>
+  <td class="num">1</td>
+  <td class="num">248ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_02_GetBookById</code><br><code>anUnknownIdIsNotFound</code></td>
+  <td>An id that matches no book is reported as not found<br><code>['-1']</code></td>
+  <td class="num">1</td>
+  <td class="num">241ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_02_GetBookById</code><br><code>anUnknownIdIsNotFound</code></td>
+  <td>An id that matches no book is reported as not found<br><code>['0']</code></td>
+  <td class="num">1</td>
+  <td class="num">233ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_02_GetBookById</code><br><code>anUnknownIdIsNotFound</code></td>
+  <td>An id that matches no book is reported as not found<br><code>['2147483647']</code></td>
+  <td class="num">1</td>
+  <td class="num">247ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_02_GetBookById</code><br><code>anUnknownIdIsNotFound</code></td>
+  <td>An id that matches no book is reported as not found<br><code>['9999']</code></td>
+  <td class="num">1</td>
+  <td class="num">240ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_03_CreateBook</code><br><code>aNegativePageCountIsAccepted</code></td>
+  <td>A negative page count is accepted, so the API applies no semantic validation</td>
+  <td class="num">1</td>
+  <td class="num">1182ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_03_CreateBook</code><br><code>aNullNonNullableFieldIsRejected</code></td>
+  <td>Each non-nullable field is rejected on its own when sent as null<br><code>['id', '{"id":null,"title":"A title","description":"d","pageCount":1,"excerpt":"e","publishDate":"2026-01-01T00:00:00Z"}']</code></td>
+  <td class="num">1</td>
+  <td class="num">241ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_03_CreateBook</code><br><code>aNullNonNullableFieldIsRejected</code></td>
+  <td>Each non-nullable field is rejected on its own when sent as null<br><code>['pageCount', '{"id":1,"title":"A title","description":"d","pageCount":null,"excerpt":"e","publishDate":"2026-01-01T00:00:00Z"}']</code></td>
+  <td class="num">1</td>
+  <td class="num">248ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_03_CreateBook</code><br><code>aNullNonNullableFieldIsRejected</code></td>
+  <td>Each non-nullable field is rejected on its own when sent as null<br><code>['publishDate', '{"id":1,"title":"A title","description":"d","pageCount":1,"excerpt":"e","publishDate":null}']</code></td>
+  <td class="num">1</td>
+  <td class="num">251ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_03_CreateBook</code><br><code>aPayloadWithWrongFieldTypesIsRejected</code></td>
+  <td>A payload whose field types do not match the schema is rejected<br><code>['a non-numeric id', '{"id":"abc","title":"A title","pageCount":1}', '$.id']</code></td>
+  <td class="num">1</td>
+  <td class="num">248ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_03_CreateBook</code><br><code>aPayloadWithWrongFieldTypesIsRejected</code></td>
+  <td>A payload whose field types do not match the schema is rejected<br><code>['a non-numeric page count', '{"id":1,"title":"A title","pageCount":"many"}', '$.pageCount']</code></td>
+  <td class="num">1</td>
+  <td class="num">251ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_03_CreateBook</code><br><code>aPayloadWithWrongFieldTypesIsRejected</code></td>
+  <td>A payload whose field types do not match the schema is rejected<br><code>['an unparsable publish date', '{"id":1,"publishDate":"not-a-date"}', '$.publishDate']</code></td>
+  <td class="num">1</td>
+  <td class="num">276ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_03_CreateBook</code><br><code>aValidBookIsAccepted</code></td>
+  <td>A valid book is accepted and echoed back unchanged</td>
+  <td class="num">1</td>
+  <td class="num">236ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_03_CreateBook</code><br><code>anEmptyJsonObjectIsFilledWithDefaults</code></td>
+  <td>Finding: an empty JSON object is filled with defaults, one of which is not a valid date-time</td>
+  <td class="num">1</td>
+  <td class="num">465ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_03_CreateBook</code><br><code>anUnsupportedMediaTypeIsRefused</code></td>
+  <td>A body sent under a media type the API does not accept is refused<br><code>['XML', 'application/xml']</code></td>
+  <td class="num">1</td>
+  <td class="num">247ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_03_CreateBook</code><br><code>anUnsupportedMediaTypeIsRefused</code></td>
+  <td>A body sent under a media type the API does not accept is refused<br><code>['plain text', 'text/plain']</code></td>
+  <td class="num">1</td>
+  <td class="num">237ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_03_CreateBook</code><br><code>anUnusableBodyIsRejected</code></td>
+  <td>A body that is not a book object is rejected<br><code>['a bare string', '"just a string"']</code></td>
+  <td class="num">1</td>
+  <td class="num">241ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_03_CreateBook</code><br><code>anUnusableBodyIsRejected</code></td>
+  <td>A body that is not a book object is rejected<br><code>['an empty body', '']</code></td>
+  <td class="num">1</td>
+  <td class="num">249ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_03_CreateBook</code><br><code>anUnusableBodyIsRejected</code></td>
+  <td>A body that is not a book object is rejected<br><code>['truncated JSON', '{"id":']</code></td>
+  <td class="num">1</td>
+  <td class="num">240ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_03_CreateBook</code><br><code>oversizedTextIsAcceptedWithoutTruncation</code></td>
+  <td>Text fields far longer than the seeded data are accepted without truncation</td>
+  <td class="num">1</td>
+  <td class="num">326ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_03_CreateBook</code><br><code>theCreatedBookIsNotRetrievable</code></td>
+  <td>A book accepted by POST cannot be read back, because the demo API keeps no state</td>
+  <td class="num">1</td>
+  <td class="num">500ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_04_UpdateBook</code><br><code>anExistingBookIsUpdated</code></td>
+  <td>An existing book is updated and the new version is echoed back</td>
+  <td class="num">1</td>
+  <td class="num">1168ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_04_UpdateBook</code><br><code>anUpdateToANonIntegerIdIsRejected</code></td>
+  <td>An update addressed to a non-integer id is rejected as a bad request<br><code>['1.5']</code></td>
+  <td class="num">1</td>
+  <td class="num">245ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_04_UpdateBook</code><br><code>anUpdateToANonIntegerIdIsRejected</code></td>
+  <td>An update addressed to a non-integer id is rejected as a bad request<br><code>['2147483648']</code></td>
+  <td class="num">1</td>
+  <td class="num">249ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_04_UpdateBook</code><br><code>anUpdateToANonIntegerIdIsRejected</code></td>
+  <td>An update addressed to a non-integer id is rejected as a bad request<br><code>['abc']</code></td>
+  <td class="num">1</td>
+  <td class="num">246ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_04_UpdateBook</code><br><code>anUpdateWithWrongFieldTypesIsRejected</code></td>
+  <td>An update whose field types do not match the schema is rejected</td>
+  <td class="num">1</td>
+  <td class="num">266ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_04_UpdateBook</code><br><code>theBodyIdWinsOverThePathId</code></td>
+  <td>When the id in the path and the id in the body disagree, the body wins</td>
+  <td class="num">1</td>
+  <td class="num">246ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_04_UpdateBook</code><br><code>theUpdateIsNotPersisted</code></td>
+  <td>An update is not persisted, because the demo API keeps no state</td>
+  <td class="num">1</td>
+  <td class="num">731ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_04_UpdateBook</code><br><code>updatingAnUnknownIdIsAccepted</code></td>
+  <td>Updating an id that matches no book is accepted rather than reported as not found</td>
+  <td class="num">1</td>
+  <td class="num">242ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_05_DeleteBook</code><br><code>aDeletionOfANonIntegerIdIsRejected</code></td>
+  <td>A deletion addressed to a non-integer id is rejected as a bad request<br><code>['1.5']</code></td>
+  <td class="num">1</td>
+  <td class="num">232ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_05_DeleteBook</code><br><code>aDeletionOfANonIntegerIdIsRejected</code></td>
+  <td>A deletion addressed to a non-integer id is rejected as a bad request<br><code>['2147483648']</code></td>
+  <td class="num">1</td>
+  <td class="num">259ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_05_DeleteBook</code><br><code>aDeletionOfANonIntegerIdIsRejected</code></td>
+  <td>A deletion addressed to a non-integer id is rejected as a bad request<br><code>['abc']</code></td>
+  <td class="num">1</td>
+  <td class="num">246ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_05_DeleteBook</code><br><code>anExistingBookIsDeleted</code></td>
+  <td>Deleting an existing book is acknowledged with an empty body</td>
+  <td class="num">1</td>
+  <td class="num">242ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_05_DeleteBook</code><br><code>deletingAnUnknownIdIsAccepted</code></td>
+  <td>Deleting an id that matches no book is acknowledged rather than reported as not found</td>
+  <td class="num">1</td>
+  <td class="num">236ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_BOOKS_05_DeleteBook</code><br><code>theDeletionIsNotPersisted</code></td>
+  <td>A deletion is not persisted, because the demo API keeps no state</td>
+  <td class="num">1</td>
+  <td class="num">491ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_CONTRACT_01_OpenApiContract</code><br><code>aDocumentedOperationIsCheckedAgainstItsSchema</code></td>
+  <td>A documented operation is checked against its schema, not merely its status code</td>
+  <td class="num">1</td>
+  <td class="num">252ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_CONTRACT_01_OpenApiContract</code><br><code>theContractDeclaresNoBodyOnAWrite</code></td>
+  <td>Finding: the contract declares no body on a write, although the API returns one</td>
+  <td class="num">1</td>
+  <td class="num">253ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_CONTRACT_01_OpenApiContract</code><br><code>theContractDocumentsNoErrorResponses</code></td>
+  <td>Finding: the contract documents no error responses, although the API returns them</td>
+  <td class="num">1</td>
+  <td class="num">244ms</td>
+</tr>
+<tr>
+  <td class="status PASS">PASS</td>
+  <td><code>TC_API_CONTRACT_01_OpenApiContract</code><br><code>theSnapshotMatchesThePublishedDocument</code></td>
+  <td>The committed snapshot still matches the published document where this suite relies on it</td>
+  <td class="num">1</td>
+  <td class="num">335ms</td>
+</tr>
+    </tbody>
+  </table>
+</main>
+</body>
+</html>

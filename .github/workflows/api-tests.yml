@@ -106,7 +106,7 @@ jobs:
         run: |
           case "${{ github.event_name }}" in
             pull_request)
-              # Eight checks. Enough to catch a broken request before it merges,
+              # Ten checks. Enough to catch a broken request before it merges,
               # short enough that a cold sandbox rarely costs anyone the afternoon.
               echo "name=smoke" >> "$GITHUB_OUTPUT"
               echo "args=-Dsuite.xml=src/test/resources/test-suites/SMOKE_RUN.xml" >> "$GITHUB_OUTPUT"

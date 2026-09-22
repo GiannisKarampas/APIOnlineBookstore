@@ -1,9 +1,15 @@
 package utils.listeners.report;
 
 import java.util.List;
+import java.util.Locale;
 
 /**
  * The headline numbers of a run.
+ * <p>
+ * Every number is rendered under {@link Locale#ROOT}. The default locale would write
+ * {@code 100,0} on a machine configured for a comma-decimal language, which changes
+ * the report a reviewer opens and fails this class's own tests for a reason that has
+ * nothing to do with the suite.
  */
 public record RunTotals(int total, int passed, int flaky, int failed, int skipped,
                         long cumulativeMillis, long elapsedMillis) {
@@ -27,16 +33,16 @@ public record RunTotals(int total, int passed, int flaky, int failed, int skippe
      * cannot be mistaken for a clean run.
      */
     public String passRate() {
-        return total == 0 ? "0.0" : String.format("%.1f", ((passed + flaky) * 100.0) / total);
+        return total == 0 ? "0.0" : String.format(Locale.ROOT, "%.1f", ((passed + flaky) * 100.0) / total);
     }
 
     /** Wall-clock time from the first test starting to the last one finishing. */
     public String elapsedInSeconds() {
-        return String.format("%.1f", elapsedMillis / 1000.0);
+        return String.format(Locale.ROOT, "%.1f", elapsedMillis / 1000.0);
     }
 
     /** Summed test durations. Exceeds elapsed time when tests run in parallel. */
     public String cumulativeInSeconds() {
-        return String.format("%.1f", cumulativeMillis / 1000.0);
+        return String.format(Locale.ROOT, "%.1f", cumulativeMillis / 1000.0);
     }
 }

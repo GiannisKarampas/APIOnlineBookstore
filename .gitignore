@@ -42,7 +42,6 @@ build/
 /test-results/
 /allure-report/
 /.allure/
-/reports/
 
 # reports/ is deliberately NOT ignored: it holds the committed execution report
 # that ships with this assessment.

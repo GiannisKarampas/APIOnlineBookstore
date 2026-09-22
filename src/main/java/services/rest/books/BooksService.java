@@ -3,12 +3,9 @@ package services.rest.books;
 import static domain.RestEndpointEnum.BOOKS;
 import static domain.RestEndpointEnum.BOOK_BY_ID;
 
-import java.util.function.Function;
-
-import io.qameta.allure.Allure;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
-import services.rest.RestCommonValidations;
+import services.ApiService;
 import utils.service.implementation.Rest;
 
 /**
@@ -20,35 +17,13 @@ import utils.service.implementation.Rest;
  * separately named {@code ...Raw...} methods, which say at the call site that
  * something invalid is being sent on purpose.
  */
-public class BooksService {
+public class BooksService extends ApiService {
 
     private static final String ID = "id";
 
-    private final Rest rest;
-    private final RestCommonValidations validations;
-
     public BooksService(Rest rest) {
-        this.rest = rest;
-        this.validations = new RestCommonValidations(rest);
+        super(rest);
     }
-
-    /**
-     * Runs assertions against the response of the most recent call, inside the
-     * reported step named by the preceding description.
-     * <p>
-     * The checks are handed in rather than chained off a returned object, because a
-     * step has to be open while they execute. Naming a step and then asserting
-     * outside it produces a step that passed beside a test that failed, which is
-     * worse than no step at all.
-     * <p>
-     * The lambda's value is returned, so the same method serves a chain that only
-     * asserts and one that ends by reading a DTO out of the response.
-     */
-    public <T> T validate(Function<RestCommonValidations, T> checks) {
-        String stepName = rest.context().consumeStepDescription().orElse("Verify the response");
-        return Allure.step(stepName, () -> checks.apply(validations));
-    }
-
 
     public Response getAllBooks() {
         return rest.getRequest(BOOKS, "");

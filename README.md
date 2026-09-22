@@ -12,7 +12,7 @@ endpoints as the bonus extension.
 | **Reporting** | Allure 2.26 + a self-contained HTML/Markdown summary |
 | **Contract** | Responses validated against the API's published OpenAPI document |
 | **CI** | GitHub Actions (`.github/workflows/api-tests.yml`) and a `Jenkinsfile` |
-| **Coverage** | 99 API and contract checks, plus 28 of the framework itself — 78 test methods |
+| **Coverage** | 99 API and contract checks, plus 28 of the framework itself — 76 test methods |
 
 **Contents** — [Quick start](#quick-start) · [Running the tests](#running-the-tests) ·
 [Reports](#reports) · [How the project is organised](#how-the-project-is-organised) ·
@@ -215,7 +215,7 @@ src/main/resources/
 src/test/java/                        the tests
 ├── TS_FRAMEWORK/                     the framework's own tests, no network
 ├── TS_API_Books/                     TC_API_BOOKS_01..05
-├── TS_API_Authors/                   TC_API_AUTHORS_01..02
+├── TS_API_Authors/                   TC_API_AUTHORS_01..05
 └── TS_API_Contract/                  TC_API_CONTRACT_01
 
 src/test/resources/test-suites/       FULL_RUN · SMOKE_RUN · BOOKS_ONLY
@@ -544,10 +544,10 @@ Why the lanes fall there:
   base URI is `bookstore.invalid`, an unresolvable name — so a pass is proof nothing
   was transmitted. A failure there is
   unambiguously this repository's fault, which is what a merge gate should mean.
-- **A pull request runs smoke, not the full suite.** Eight checks catch a broken
-  request before it merges; running all 101 would make every pull request depend on a
+- **A pull request runs smoke, not the full suite.** Ten checks catch a broken
+  request before it merges; running all 99 would make every pull request depend on a
   free-tier sandbox being awake.
-- **`main` runs 81, not 99.** The 12 excluded are `provider-behaviour` — they pin
+- **`main` runs 81, not 99.** The 18 excluded are `provider-behaviour` — they pin
   what FakeRestAPI does *today*. If the provider completes their OpenAPI document
   tomorrow, those go red. A test that fails because a third party improved must never
   block somebody's merge.

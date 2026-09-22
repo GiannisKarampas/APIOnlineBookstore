@@ -15,7 +15,7 @@ import utils.enums.Environment;
  * Reads the settings of the environment the run was started against.
  * <p>
  * Which file that is comes from the active Maven profile, so switching environment
- * is {@code -Puat} and never a code change.
+ * is {@code -Plocal} and never a code change.
  */
 public class EnvDataConfig {
 
