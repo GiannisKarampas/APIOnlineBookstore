@@ -1,13 +1,8 @@
-/*
- * The same pipeline as .github/workflows/api-tests.yml, for a Jenkins controller.
- * Requires the Allure Jenkins plugin and a JDK 21 plus Maven tool installation.
- */
 pipeline {
     agent any
 
     tools {
         jdk 'jdk-21'
-        maven 'maven-3'
     }
 
     parameters {

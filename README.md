@@ -1,5 +1,7 @@
 # Online Bookstore — API Test Automation
 
+[![API Tests](https://github.com/GiannisKarampas/APIOnlineBookstore/actions/workflows/api-tests.yml/badge.svg)](https://github.com/GiannisKarampas/APIOnlineBookstore/actions/workflows/api-tests.yml)
+
 Automated test suite for the [FakeRestAPI](https://fakerestapi.azurewebsites.net/index.html)
 Online Bookstore service, covering the **Books** endpoints in full and the **Authors**
 endpoints as the bonus extension.
@@ -168,7 +170,8 @@ duration and failure message. It opens straight from disk, needs no tooling, and
 Markdown twin (`summary.md`) is what CI folds into the run page. A copy of the latest
 run is committed under [`reports/`](reports/).
 
-**2. Allure report** — `allure-report/index.html`
+**2. Allure report** — `allure-report/index.html`, published from `main` at
+**<https://gianniskarampas.github.io/APIOnlineBookstore/>**
 
 ```bash
 ./mvnw io.qameta.allure:allure-maven:report   # generate

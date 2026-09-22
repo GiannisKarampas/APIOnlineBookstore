@@ -44,8 +44,8 @@ jobs:
     if: github.event.schedule != '0 3 * * 1'
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: temurin
@@ -61,8 +61,8 @@ jobs:
     if: github.event.schedule != '0 3 * * 1'
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: temurin
@@ -73,7 +73,7 @@ jobs:
 
       - name: Upload the framework results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: framework-results-${{ github.run_number }}
           path: |
@@ -94,8 +94,8 @@ jobs:
     if: github.event.schedule != '0 3 * * 1'
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: temurin
@@ -154,7 +154,7 @@ jobs:
 
       - name: Upload the Allure report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: allure-report-${{ github.run_number }}
           path: allure-report
@@ -162,7 +162,7 @@ jobs:
 
       - name: Upload the execution summary and raw results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-results-${{ github.run_number }}
           path: |
@@ -182,15 +182,15 @@ jobs:
     if: github.event.schedule == '0 3 * * 1' || (github.event_name == 'workflow_dispatch' && inputs.run_audit)
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: temurin
           cache: maven
 
       - name: Restore the vulnerability database
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.m2/repository/org/owasp/dependency-check-data
           key: nvd-${{ github.run_id }}
@@ -204,7 +204,7 @@ jobs:
 
       - name: Upload the audit
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: dependency-audit-${{ github.run_number }}
           path: target/dependency-check-report.html
@@ -230,16 +230,16 @@ jobs:
 
     steps:
       - name: Download the Allure report
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: allure-report-${{ github.run_number }}
           path: allure-report
 
       - name: Package the report for Pages
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: allure-report
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
