@@ -37,7 +37,7 @@
         <allureTestNg.version>2.26.0</allureTestNg.version>
         <allureMaven.version>2.15.2</allureMaven.version>
         <allure.rest.assured.version>2.26.0</allure.rest.assured.version>
-        <aspectj.version>1.9.25</aspectj.version>
+        <aspectj.version>1.9.25.1</aspectj.version>
         <faker.version>1.0.2</faker.version>
         <swagger.validator.version>2.44.1</swagger.validator.version>
     </properties>
