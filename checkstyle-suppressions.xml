@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC
+        "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+        "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+
+<suppressions>
+
+    <!--
+        Test packages and classes carry QA traceability identifiers
+        (TS_ = test suite, TC_ = test case), which is how these tests are referred
+        to in the report, in stack traces and in conversation. That convention is
+        deliberate and predates this suite, so PackageName and TypeName are waived
+        for test sources only. Everything under src/main follows Java conventions
+        and is checked normally.
+    -->
+    <suppress checks="PackageName|TypeName" files="[\\/]src[\\/]test[\\/]java[\\/]"/>
+
+    <!--
+        Test classes are documented by their @Test descriptions, which is what the
+        report renders. A class-level Javadoc naming the endpoint is present anyway,
+        but is not enforced on data providers and helpers.
+    -->
+    <suppress checks="JavadocType|MissingJavadocType" files="[\\/]src[\\/]test[\\/]java[\\/]"/>
+
+</suppressions>

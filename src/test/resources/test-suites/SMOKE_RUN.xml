@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<!--
+    The subset that answers "is the bookstore API up and behaving?".
+    Meant to gate a deployment, so it stays short.
+-->
+<suite name="Online Bookstore - Smoke" verbose="1" parallel="classes" thread-count="4">
+    
+    <test name="Smoke">
+        <groups>
+            <run>
+                <include name="smoke"/>
+            </run>
+        </groups>
+        <packages>
+            <package name="TS_API_Books"/>
+            <package name="TS_API_Authors"/>
+            <package name="TS_API_Contract"/>
+        </packages>
+    </test>
+    
+</suite>

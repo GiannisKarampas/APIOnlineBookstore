@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<!--
+    Every check against the API: Books, Contract, then Authors.
+
+    The framework's own tests are deliberately not here. They are a different kind of
+    check - no network, a different meaning when they fail - and they have their own
+    lane, selected with -Dgroups=framework. Listing them here as well meant they ran
+    twice on every push to main: once in their own CI job, again inside this suite,
+    which left a red API job ambiguous about what had actually broken.
+    Classes run in parallel, methods within a class run in order, which keeps the
+    load on the shared public sandbox reasonable while still finishing quickly.
+-->
+<suite name="Online Bookstore - Full Run" verbose="1" parallel="classes" thread-count="4">
+    
+    <test name="Books API">
+        <classes>
+            <class name="TS_API_Books.TC_API_BOOKS_01_GetAllBooks"/>
+            <class name="TS_API_Books.TC_API_BOOKS_02_GetBookById"/>
+            <class name="TS_API_Books.TC_API_BOOKS_03_CreateBook"/>
+            <class name="TS_API_Books.TC_API_BOOKS_04_UpdateBook"/>
+            <class name="TS_API_Books.TC_API_BOOKS_05_DeleteBook"/>
+        </classes>
+    </test>
+    
+    <test name="Contract">
+        <classes>
+            <class name="TS_API_Contract.TC_API_CONTRACT_01_OpenApiContract"/>
+        </classes>
+    </test>
+
+    <test name="Authors API">
+        <classes>
+            <class name="TS_API_Authors.TC_API_AUTHORS_01_GetAllAuthors"/>
+            <class name="TS_API_Authors.TC_API_AUTHORS_02_GetAuthorById"/>
+            <class name="TS_API_Authors.TC_API_AUTHORS_03_CreateAuthor"/>
+            <class name="TS_API_Authors.TC_API_AUTHORS_04_UpdateAuthor"/>
+            <class name="TS_API_Authors.TC_API_AUTHORS_05_DeleteAuthor"/>
+        </classes>
+    </test>
+    
+</suite>

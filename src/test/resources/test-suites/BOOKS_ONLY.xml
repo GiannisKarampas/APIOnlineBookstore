@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<!--
+    The mandatory scope of the assessment on its own, without the Authors bonus.
+-->
+<suite name="Online Bookstore - Books only" verbose="1" parallel="classes" thread-count="4">
+    
+    <test name="Books API">
+        <packages>
+            <package name="TS_API_Books"/>
+        </packages>
+    </test>
+    
+</suite>

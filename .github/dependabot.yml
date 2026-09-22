@@ -1,0 +1,27 @@
+# Keeps the toolchain current without anybody having to remember.
+# Grouped so that a routine bump is one reviewable pull request rather than ten.
+version: 2
+updates:
+  - package-ecosystem: maven
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      test-tooling:
+        patterns:
+          - "io.rest-assured:*"
+          - "org.testng:*"
+          - "io.qameta.allure:*"
+          - "com.atlassian.oai:*"
+      build-tooling:
+        patterns:
+          - "org.apache.maven.plugins:*"
+          - "com.diffplug.spotless:*"
+          - "com.puppycrawl.tools:*"
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly

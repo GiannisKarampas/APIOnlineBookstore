@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<!--
+    The framework's own tests: request isolation, the retry policy, the execution
+    context and the summary report.
+
+    A separate suite rather than a block inside FULL_RUN, because these are a
+    different kind of check. They reach nothing outside this machine, so a failure
+    here means this repository is wrong - never that a shared sandbox was having a
+    bad moment. That is what makes them a sound gate in front of the API suites, and
+    keeping them separate is what keeps a red API run unambiguous.
+-->
+<suite name="Online Bookstore - Framework" verbose="1" parallel="classes" thread-count="4">
+
+    <test name="Framework">
+        <packages>
+            <package name="TS_FRAMEWORK"/>
+        </packages>
+    </test>
+
+</suite>
