@@ -33,7 +33,7 @@
         <apache-commons.version>3.14.0</apache-commons.version>
         <lombok.version>1.18.42</lombok.version>
         <jackson-core.version>2.17.0</jackson-core.version>
-        <jayway-jsonpath.version>2.9.0</jayway-jsonpath.version>
+        <jayway-jsonpath.version>3.0.0</jayway-jsonpath.version>
         <allureTestNg.version>2.26.0</allureTestNg.version>
         <allureMaven.version>2.15.2</allureMaven.version>
         <allure.rest.assured.version>2.26.0</allure.rest.assured.version>
