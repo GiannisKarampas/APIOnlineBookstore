@@ -44,7 +44,7 @@ jobs:
     if: github.event.schedule != '0 3 * * 1'
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-java@v4
         with:
           java-version: ${{ env.JAVA_VERSION }}
@@ -61,7 +61,7 @@ jobs:
     if: github.event.schedule != '0 3 * * 1'
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-java@v4
         with:
           java-version: ${{ env.JAVA_VERSION }}
@@ -94,7 +94,7 @@ jobs:
     if: github.event.schedule != '0 3 * * 1'
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-java@v4
         with:
           java-version: ${{ env.JAVA_VERSION }}
@@ -182,7 +182,7 @@ jobs:
     if: github.event.schedule == '0 3 * * 1' || (github.event_name == 'workflow_dispatch' && inputs.run_audit)
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-java@v4
         with:
           java-version: ${{ env.JAVA_VERSION }}
