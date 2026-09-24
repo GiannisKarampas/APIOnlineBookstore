@@ -24,7 +24,7 @@
         <spotless.version>2.44.0</spotless.version>
         <checkstyle.plugin.version>3.6.0</checkstyle.plugin.version>
         <checkstyle.version>10.21.0</checkstyle.version>
-        <dependencyCheck.version>12.1.3</dependencyCheck.version>
+        <dependencyCheck.version>13.0.0</dependencyCheck.version>
         <min.maven.version>3.8.0</min.maven.version>
         <maven.surefire.version>3.2.5</maven.surefire.version>
         <testNg.version>7.9.0</testNg.version>
