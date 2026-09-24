@@ -9,8 +9,9 @@ The committed result of a full run against the `dev` environment
 | `execution-summary.md` | The same content as Markdown. This is what CI folds into the GitHub Actions run page. |
 | `framework-summary.html` | The framework's own tests — the gate that runs before the API suite. |
 | `framework-summary.md` | The same, as Markdown. |
+| `jenkins/` | The build log and screenshots from the Jenkins controller, which is local and cannot be linked to. See [`jenkins/README.md`](jenkins/README.md). |
 
-**Result: 99 / 99 API checks passed, and 28 / 28 framework checks.**
+**Result: 123 / 123 API cases passed, and 35 / 35 framework cases.**
 
 The two are reported separately because they mean different things. A failure in the
 API suite may mean the shared public sandbox is having a bad moment; a failure in the

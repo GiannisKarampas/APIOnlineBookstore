@@ -97,7 +97,7 @@ compile time rather than silently running nothing.
 S=src/test/resources/test-suites
 
 ./mvnw test -Dsuite.xml=$S/FRAMEWORK.xml      # 35 cases, no network
-./mvnw test -Dsuite.xml=$S/SMOKE_RUN.xml      # 10 checks, the merge gate
+./mvnw test -Dsuite.xml=$S/SMOKE_RUN.xml      # 10 cases, the merge gate
 ./mvnw test -DexcludedGroups=provider-behaviour   # 105 cases, the main-branch regression
 ./mvnw test                                   # 123 cases, every API and contract case
 ./run-tests.sh                                # the framework gate, then the API suite
@@ -197,6 +197,7 @@ src/main/java/                        the framework
 ├── domain/RestEndpointEnum.java      every URL, declared once
 ├── models/errors/                    the RFC 7807 problem document
 ├── services/
+│   ├── ApiService.java               what every service shares: rest + validate(...)
 │   ├── contract/                     ApiContract · ContractService
 │   └── rest/
 │       ├── RestCommonValidations.java assertions valid for any response
@@ -230,7 +231,7 @@ src/test/resources/test-suites/       FRAMEWORK · FULL_RUN · SMOKE_RUN · BOOK
 | Layer | Responsibility | Depends on |
 |---|---|---|
 | **Test** | States a scenario and what should be true | Service + assertions |
-| **Service** (`BooksService`) | One method per API operation. No assertions. | Transport + endpoints |
+| **Service** (`BooksService`) | One method per API operation. No assertions. Extends `ApiService`, which holds the transport and the `validate(...)` all three services share | Transport + endpoints |
 | **Assertions** (`BookAssertions`) | What this suite expects of a *book from the seeded catalogue* — distinct from schema validity, which the contract check covers | The DTO only |
 | **Validations** (`RestCommonValidations`) | What makes any *response* valid | The transport |
 | **Transport** (`Rest`) | Builds and sends requests, records the response | Configuration |
@@ -576,7 +577,7 @@ Why the lanes fall there:
   them in memory without forwarding to the network, with `bookstore.invalid` as
   their base URI. A failure there is
   unambiguously this repository's fault, which is what a merge gate should mean.
-- **A pull request runs smoke, not the full suite.** Ten checks catch a broken
+- **A pull request runs smoke, not the full suite.** Ten cases catch a broken
   request before it merges; running all 123 would make every pull request depend on a
   free-tier sandbox being awake.
 - **`main` runs 105 of the 123 API cases.** The 18 excluded are `provider-behaviour` — they pin
@@ -592,11 +593,41 @@ results. The framework job uploads its summary and raw results separately.
 Publishing to Pages happens on `main` only, so a pull request cannot overwrite what
 is published.
 
+### Jenkins
+
 A [`Jenkinsfile`](Jenkinsfile) mirrors the same lanes — static analysis, framework
 tests, API tests, then the audit — for a Jenkins controller. The
 `INCLUDE_PROVIDER_CHARACTERISATION` parameter is the equivalent of the nightly lane:
-off for a merge gate, on for a scheduled run. It requires the Allure and HTML
-Publisher plugins and `jdk-21` / `maven-3` tool installations.
+off for a merge gate, on for a scheduled run.
+
+It needs, on the controller:
+
+| Requirement | Where |
+|---|---|
+| A JDK tool installation named `jdk-21` | Manage Jenkins → Tools → JDK installations |
+| The **Allure** plugin, plus an Allure Commandline tool installation | Plugins, then Tools |
+| The **HTML Publisher** plugin | Plugins |
+
+No Maven tool installation is needed: every stage calls `./mvnw`, so the build uses
+the wrapper's pinned Maven rather than whatever the controller happens to have.
+
+**It has been run.** A Jenkins LTS controller executes it green — static analysis,
+the 35 framework cases, then 105 API cases with `provider-behaviour` excluded, with
+the Allure report generated and archived. The evidence is under
+[`reports/jenkins/`](reports/jenkins/), because that controller is local and cannot be
+reached from outside.
+
+### Which pipeline you can verify
+
+The two are not equivalent, and it is worth being explicit about which is which.
+
+**GitHub Actions runs on every push and is publicly verifiable** — the badge at the
+top of this file, the run history and the uploaded artifacts are all part of this
+repository, and anyone can open them.
+
+**Jenkins mirrors the same lanes on a local controller.** It cannot be reached from
+outside, so the build log and screenshots under [`reports/jenkins/`](reports/jenkins/)
+are the evidence rather than a live link.
 
 **It has not been run against a real Jenkins.** It parses as valid Groovy, which
 catches syntax errors but says nothing about whether the declarative DSL is well
