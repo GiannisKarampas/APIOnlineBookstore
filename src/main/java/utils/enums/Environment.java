@@ -8,8 +8,6 @@ import lombok.Getter;
  */
 @Getter
 public enum Environment {
-    /** A copy of the API hosted by the developer, on localhost. */
-    LOCAL("local"),
     /** The public FakeRestAPI sandbox, which is the only hosted instance there is. */
     DEV("dev");
 

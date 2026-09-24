@@ -41,6 +41,13 @@ final class TestNgResults {
     }
 
     /**
+     * An attempt that failed outright, as the retry analyzer is handed it.
+     */
+    static ITestResult failedWith(Throwable failure) {
+        return result(ITestResult.FAILURE, false, failure, 1_000, 2_000);
+    }
+
+    /**
      * A test genuinely skipped — a dependency failed, say — and never retried.
      */
     static ITestResult skipped() {

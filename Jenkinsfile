@@ -6,8 +6,6 @@ pipeline {
     }
 
     parameters {
-        choice(name: 'ENVIRONMENT', choices: ['dev', 'local'],
-                description: 'Environment profile to run against')
         choice(name: 'SUITE', choices: ['FULL_RUN', 'SMOKE_RUN', 'BOOKS_ONLY'],
                 description: 'Suite to execute')
         booleanParam(name: 'RUN_DEPENDENCY_AUDIT', defaultValue: false,
@@ -82,7 +80,7 @@ pipeline {
                     // the end cover the whole build.
                     sh """
                         ./mvnw -B test \
-                            -P${params.ENVIRONMENT} \
+                            -Pdev \
                             -Dsuite.xml=src/test/resources/test-suites/${params.SUITE}.xml \
                             ${exclusions}
                     """

@@ -2,6 +2,7 @@ package TS_API_Books;
 
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 import static org.apache.http.HttpStatus.SC_OK;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static utils.TestGroups.BOOKS;
 import static utils.TestGroups.EDGE_CASE;
@@ -20,6 +21,7 @@ import io.qameta.allure.Severity;
 import io.qameta.allure.SeverityLevel;
 import io.qameta.allure.Story;
 import models.errors.ProblemDetailsDTO;
+import services.rest.books.BookDTO;
 import utils.data.BookFactory;
 import utils.data.SeededCatalogue.Books;
 
@@ -41,8 +43,8 @@ public class TC_API_BOOKS_05_DeleteBook extends BookstoreTest {
 
     @Severity(SeverityLevel.CRITICAL)
     @Test(groups = {SMOKE, REGRESSION, BOOKS, HAPPY_PATH},
-            description = "Deleting an existing book is acknowledged with an empty body")
-    public void anExistingBookIsDeleted() {
+            description = "A deletion of an existing book is acknowledged with an empty body")
+    public void aDeletionOfAnExistingBookIsAcknowledged() {
         books("Delete book " + A_SEEDED_BOOK_ID).deleteBook(A_SEEDED_BOOK_ID);
 
         books("Verify the deletion is acknowledged without a body").validate(checks -> checks
@@ -71,7 +73,13 @@ public class TC_API_BOOKS_05_DeleteBook extends BookstoreTest {
         books("Verify the deletion was acknowledged").validate(checks -> checks.verifyStatusCode(SC_OK));
 
         books("Read the deleted book back").getBookById(A_SEEDED_BOOK_ID);
-        books("Verify the book is still there").validate(checks -> checks.verifyStatusCode(SC_OK));
+        BookDTO survivor = books("Verify the book is still there").validate(checks -> checks
+                    .verifyStatusCode(SC_OK)
+                    .as(BookDTO.class));
+
+        // A 200 alone would also be satisfied by the API returning some other book.
+        assertEquals(survivor.getId(), Integer.valueOf(A_SEEDED_BOOK_ID),
+                "The deleted id resolved to a different record, so this is not the book that survived.");
     }
 
     @Severity(SeverityLevel.MINOR)

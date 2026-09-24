@@ -15,6 +15,10 @@ import static utils.TestGroups.PROVIDER_BEHAVIOUR;
 import static utils.TestGroups.REGRESSION;
 import static utils.TestGroups.SMOKE;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
+
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -134,6 +138,63 @@ public class TC_API_BOOKS_03_CreateBook extends BookstoreTest {
                     .as(BookDTO.class));
 
         BookAssertions.assertEchoes(accepted, submitted);
+    }
+
+    /**
+     * Text that is entirely valid and entirely unlike what the generator produces.
+     * <p>
+     * Generated happy-path data is ASCII words, so nothing in the suite would notice a
+     * field limited by bytes rather than characters, an encoding that mangles
+     * astral-plane code points, or escaping that breaks on a quote. These rows are
+     * fixed rather than generated, so a failure names the exact input every time.
+     */
+    @DataProvider(name = "awkwardButValidText")
+    public Object[][] awkwardButValidText() {
+        return new Object[][]{
+                {"CJK characters", "\u66f8\u7c4d\u306e\u30bf\u30a4\u30c8\u30eb"},
+                {"emoji outside the basic plane", "A title \ud83d\udcda\ud83d\udd16"},
+                {"quotes and a backslash", "He said \"hello\" \\ then left"},
+                {"a newline and a tab", "Line one\nLine two\tindented"},
+                {"right-to-left text", "\u0639\u0646\u0648\u0627\u0646 \u0627\u0644\u0643\u062a\u0627\u0628"},
+        };
+    }
+
+    @Severity(SeverityLevel.MINOR)
+    @Test(dataProvider = "awkwardButValidText",
+            groups = {REGRESSION, BOOKS, EDGE_CASE},
+            description = "Valid but awkward text survives the round trip unchanged")
+    public void awkwardTextSurvivesTheRoundTrip(String scenario, String title) {
+        BookDTO submitted = BookFactory.aValidBook().toBuilder().title(title).build();
+
+        books("Submit a book whose title is " + scenario).createBook(submitted);
+
+        BookDTO accepted = books("Verify the text comes back byte for byte").validate(checks -> checks
+                    .verifyStatusCode(SC_OK)
+                    .as(BookDTO.class));
+
+        BookAssertions.assertEchoes(accepted, submitted);
+    }
+
+    @Severity(SeverityLevel.MINOR)
+    @Test(groups = {REGRESSION, BOOKS, EDGE_CASE},
+            description = "A publish date carrying a non-UTC offset keeps its instant")
+    public void aNonUtcPublishDateKeepsItsInstant() {
+        // Every generated date is UTC, so nothing else in the suite would notice an
+        // offset being dropped rather than converted - which silently moves a date.
+        OffsetDateTime twoHoursAhead = OffsetDateTime.now(ZoneOffset.ofHours(2)).truncatedTo(ChronoUnit.SECONDS);
+        BookDTO submitted = BookFactory.aValidBook().toBuilder().publishDate(twoHoursAhead).build();
+
+        books("Submit a book published at " + twoHoursAhead).createBook(submitted);
+
+        BookDTO accepted = books("Verify the instant survives, however it is rendered").validate(checks -> checks
+                    .verifyStatusCode(SC_OK)
+                    .as(BookDTO.class));
+
+        // The instant, not the offset: normalising +02:00 to UTC is a representation
+        // choice, but changing the moment in time is data loss.
+        assertEquals(accepted.getPublishDate().toInstant(), submitted.getPublishDate().toInstant(),
+                "The publish date moved in time. Submitted " + submitted.getPublishDate()
+                        + ", got back " + accepted.getPublishDate() + ".");
     }
 
     @Severity(SeverityLevel.MINOR)

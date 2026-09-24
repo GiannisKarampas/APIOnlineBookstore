@@ -36,6 +36,15 @@ public final class SeededCatalogue {
         /** The lowest seeded id, used where a test just needs one that exists. */
         public static final int FIRST = READ_ONLY.get(0);
 
+        /**
+         * How many books the API ships with.
+         * <p>
+         * The catalogue is asserted to be <em>at least</em> this size rather than
+         * exactly it: every id this suite fetches individually must be reachable from
+         * the collection, but a provider adding demonstration data is not a defect.
+         */
+        public static final int SEEDED_COUNT = 200;
+
         /** Owned by the update tests; no read test asserts on it. */
         public static final int OWNED_BY_UPDATE_TESTS = 101;
 

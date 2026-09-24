@@ -76,6 +76,11 @@ public final class BookAssertions {
 
     @Step("Verify the ids are unique")
     public static void assertIdsAreUnique(List<BookDTO> books) {
+        // An empty collection satisfies uniqueness trivially (0 == 0), so the check
+        // would pass on the one response that most deserves to fail it.
+        assertNotNull(books, "Expected a collection of books but got nothing.");
+        assertFalse(books.isEmpty(), "An empty catalogue cannot demonstrate unique ids.");
+
         Set<Integer> uniqueIds = books.stream().map(BookDTO::getId).collect(Collectors.toSet());
         assertEquals(uniqueIds.size(), books.size(),
                 "The catalogue contains duplicate book ids: " + duplicateIdsOf(books));
@@ -101,6 +106,18 @@ public final class BookAssertions {
     public static void assertContainsId(List<BookDTO> books, int expectedId) {
         assertTrue(books.stream().anyMatch(book -> Objects.equals(book.getId(), expectedId)),
                 "No book with id " + expectedId + " in a catalogue of " + books.size() + " books.");
+    }
+
+    /**
+     * Asserts every one of the given ids is present in the collection.
+     * <p>
+     * Ties the collection endpoint to the single-item endpoint: without it the
+     * catalogue could return well-formed books that are an entirely different set
+     * from the ones fetched by id, and both would stay green.
+     */
+    @Step("Verify the collection contains every seeded id under test")
+    public static void assertContainsIds(List<BookDTO> books, List<Integer> expectedIds) {
+        expectedIds.forEach(expectedId -> assertContainsId(books, expectedId));
     }
 
     /**

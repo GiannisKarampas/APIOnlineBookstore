@@ -61,7 +61,7 @@ public class TC_API_AUTHORS_03_CreateAuthor extends BookstoreTest {
         return new Object[][]{
                 {"a non-numeric id", "{\"id\":\"abc\",\"idBook\":1,\"firstName\":\"Ada\"}", "$.id"},
                 {"a non-numeric book reference", "{\"id\":1,\"idBook\":\"one\",\"firstName\":\"Ada\"}", "$.idBook"},
-                {"a numeric first name", "{\"id\":1,\"idBook\":1,\"firstName\":{}}", "$.firstName"},
+                {"an object where a first name belongs", "{\"id\":1,\"idBook\":1,\"firstName\":{}}", "$.firstName"},
         };
     }
 

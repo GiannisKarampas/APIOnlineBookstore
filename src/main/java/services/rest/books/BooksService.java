@@ -72,10 +72,24 @@ public class BooksService extends ApiService {
     }
 
     /**
+     * Updates a book under a content type of the caller's choosing.
+     */
+    public Response updateBookWithContentType(int bookId, ContentType contentType, String rawPayload) {
+        return rest.putRequest(BOOK_BY_ID, "", rawPayload, contentType, ID, bookId);
+    }
+
+    /**
      * Updates a book with a body exactly as given, including an invalid one.
      */
     public Response updateBookFromRawPayload(int bookId, String rawPayload) {
         return rest.putRequest(BOOK_BY_ID, "", rawPayload, ID, bookId);
+    }
+
+    /**
+     * Sends a PATCH to the collection, which this API does not implement.
+     */
+    public Response patchBooks(String rawPayload) {
+        return rest.patchRequest(BOOKS, "", rawPayload);
     }
 
     /**

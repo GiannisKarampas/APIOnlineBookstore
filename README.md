@@ -14,7 +14,7 @@ endpoints as the bonus extension.
 | **Reporting** | Allure 2.26 + a self-contained HTML/Markdown summary |
 | **Contract** | Responses validated against the API's published OpenAPI document |
 | **CI** | GitHub Actions (`.github/workflows/api-tests.yml`) and a `Jenkinsfile` |
-| **Coverage** | 99 API and contract checks, plus 28 of the framework itself — 76 test methods |
+| **Coverage** | 123 API and contract cases, plus 35 framework cases — 158 cases from 92 test methods |
 
 **Contents** — [Quick start](#quick-start) · [Running the tests](#running-the-tests) ·
 [Reports](#reports) · [How the project is organised](#how-the-project-is-organised) ·
@@ -51,8 +51,10 @@ mvnw.cmd clean test -Pdev
 start test-results\summary\index.html
 ```
 
-`./run-tests.sh` takes **about 25 seconds**: 28 framework checks as a gate, then 99
-against the live API.
+`./run-tests.sh` runs 35 framework cases as a gate, then 123 against the live API,
+and generates the reports. The saved September 23 run records 0.8 seconds for the
+framework tests and 12.2 seconds for the API tests; build and report generation add
+time, and live API latency varies.
 
 ---
 
@@ -62,7 +64,6 @@ Everything the script does is plain Maven:
 
 ```bash
 ./mvnw clean test                                                  # FULL_RUN, dev environment
-./mvnw clean test -Plocal                                           # a locally hosted copy
 ./mvnw clean test -Dsuite.xml=src/test/resources/test-suites/SMOKE_RUN.xml
 ./mvnw clean test -Dgroups=smoke                                   # by TestNG group
 ./mvnw clean test -Dtest=TC_API_BOOKS_02_GetBookById               # a single class
@@ -71,17 +72,17 @@ Everything the script does is plain Maven:
 `mvn` works just as well if you have it installed; `./mvnw` is used throughout so
 that everyone — and CI — runs the same Maven version.
 
-`./run-tests.sh [SUITE] [ENVIRONMENT]` wraps the same commands and always generates
-both reports afterwards, e.g. `./run-tests.sh SMOKE_RUN local`.
+`./run-tests.sh [SUITE]` wraps the same commands and always generates both reports
+afterwards, e.g. `./run-tests.sh SMOKE_RUN`.
 
 ### Suites
 
 | Suite | What it runs | When to use it |
 |---|---|---|
-| `FRAMEWORK` | The framework's own tests, no network | The gate in front of everything else |
-| `FULL_RUN` | Every API and contract check | The default; CI nightly |
-| `SMOKE_RUN` | The `smoke` group only | Gating a deployment |
-| `BOOKS_ONLY` | The Books package | The mandatory scope of the assessment on its own |
+| `FRAMEWORK` | 35 framework cases, no network | The gate in front of everything else |
+| `FULL_RUN` | 123 API and contract cases; excludes framework tests | The default; CI nightly |
+| `SMOKE_RUN` | 10 cases in the `smoke` group | Gating a deployment |
+| `BOOKS_ONLY` | 63 Books cases | The mandatory scope of the assessment on its own |
 
 ### Groups
 
@@ -95,10 +96,10 @@ compile time rather than silently running nothing.
 ```bash
 S=src/test/resources/test-suites
 
-./mvnw test -Dsuite.xml=$S/FRAMEWORK.xml      # 28 checks, no network
+./mvnw test -Dsuite.xml=$S/FRAMEWORK.xml      # 35 cases, no network
 ./mvnw test -Dsuite.xml=$S/SMOKE_RUN.xml      # 10 checks, the merge gate
-./mvnw test -DexcludedGroups=provider-behaviour   # 81 checks, the main-branch regression
-./mvnw test                                   # 99 checks, every API and contract check
+./mvnw test -DexcludedGroups=provider-behaviour   # 105 cases, the main-branch regression
+./mvnw test                                   # 123 cases, every API and contract case
 ./run-tests.sh                                # the framework gate, then the API suite
 ```
 
@@ -121,8 +122,8 @@ To gate a pipeline on regressions alone:
 ```
 
 The property is case-sensitive and Surefire ignores an unrecognised one silently, so
-a misspelling runs the full suite while looking like it excluded something. 99 checks
-with the group, 81 without — if the count does not drop, the flag did not take.
+a misspelling runs the full suite while looking like it excluded something. 123 cases
+with the group, 105 without — if the count does not drop, the flag did not take.
 
 ### Environments
 
@@ -134,14 +135,12 @@ rest.url=https://fakerestapi.azurewebsites.net
 retry=3
 ```
 
-There are two, because there are two things to point at: `dev` is the public sandbox,
-`local` is a copy you host yourself on `http://localhost:8080`. Earlier versions of
-this suite also carried `sit`, `uat` and `preprod`; they were four identical files
-pointing at the same sandbox, which demonstrated a pattern at the cost of pretending
-to environments that do not exist. Adding a real one is one properties file and one
-Maven profile.
-
-Switching environment is `-Plocal`, never a code change.
+There is exactly one, `dev`, because there is exactly one instance to point at: the
+public sandbox. Earlier versions of this suite also carried `sit`, `uat`, `preprod`
+and a `local` profile aimed at `http://localhost:8080`; they demonstrated a pattern at
+the cost of pretending to environments that do not exist, and FakeRestAPI publishes
+neither source nor an image anyone could host. Adding a real one is one properties
+file and one Maven profile, and no code change.
 
 For an instance whose address is not known in advance — a review app, an ephemeral
 deployment — `-DbaseUrl` overrides the profile without adding one:
@@ -150,9 +149,11 @@ deployment — `-DbaseUrl` overrides the profile without adding one:
 ./mvnw clean test -DbaseUrl=https://bookstore-pr-421.example.com
 ```
 
-Each profile also sets its own connect and socket timeouts, and whether relaxed TLS
-is permitted. It is off everywhere except `local`, where a developer's own instance
-often has nothing better than a self-signed certificate.
+A profile also carries its own connect and socket timeouts, which is what a profile
+buys over a bare `-DbaseUrl`: an environment is a set of behaviours, not just an
+address. Certificates must validate everywhere — nothing in the suite relaxes TLS,
+because a suite that accepts any certificate cannot tell a correctly served API from
+one behind a broken or substituted one.
 
 ---
 
@@ -221,7 +222,7 @@ src/test/java/                        the tests
 ├── TS_API_Authors/                   TC_API_AUTHORS_01..05
 └── TS_API_Contract/                  TC_API_CONTRACT_01
 
-src/test/resources/test-suites/       FULL_RUN · SMOKE_RUN · BOOKS_ONLY
+src/test/resources/test-suites/       FRAMEWORK · FULL_RUN · SMOKE_RUN · BOOKS_ONLY
 ```
 
 ### The layers, and why there are exactly these
@@ -235,10 +236,9 @@ src/test/resources/test-suites/       FULL_RUN · SMOKE_RUN · BOOKS_ONLY
 | **Transport** (`Rest`) | Builds and sends requests, records the response | Configuration |
 | **Configuration** | Which environment, which URL | Nothing |
 
-Adding an endpoint touches one enum constant and one service method. Adding a
-*resource* adds one package and one line in `IRestServiceFactory` — no existing class
-changes, which is the open/closed principle doing actual work rather than decorating
-a README.
+Adding an endpoint touches one enum constant and one service method, followed by its
+tests. Adding a resource also needs factory wiring, a test-facing accessor and suite
+registration; see [Extending the framework](#extending-the-framework).
 
 The split between `RestCommonValidations` and `BookAssertions` is the same idea from
 the other direction: "a 200 with a JSON body" and "a book with a positive id" are
@@ -280,8 +280,9 @@ at all. In Allure this reads as:
 
 ## Testing the framework itself
 
-28 checks never open a socket. They cover request isolation, the retry
-policy, the execution context and the summary report
+35 cases never open a socket. They cover request isolation, the retry
+policy and attempt limit, execution context, summary aggregation, thread isolation
+and schema validation with valid and malformed responses
 ([`TS_FRAMEWORK`](src/test/java/TS_FRAMEWORK)).
 
 They exist because of a specific lesson. Three defects — a content type that leaked
@@ -332,11 +333,11 @@ on the documented read operations are validated against it, so the suite checks 
 whole shape of a payload rather than only the fields someone thought to assert on:
 
 ```java
-books("Verify a well-formed book is returned as JSON").validate()
+books("Verify a well-formed book is returned as JSON").validate(checks -> checks
         .verifyStatusCode(SC_OK)
         .verifyContentTypeIsJson()
         .verifyMatchesContract()      // every field, its type, its nullability
-        .as(BookDTO.class);
+        .as(BookDTO.class));
 ```
 
 This catches what hand-written assertions structurally cannot. A `pageCount` that
@@ -360,9 +361,9 @@ does not describe FakeRestAPI:
 | Finding | Evidence |
 |---|---|
 | **No error responses are documented.** Every operation declares `200` and nothing else, although the API returns `404` for an unknown id and `400` for an unbindable one. | `Response status 404 not defined for path '/api/v1/Books/{id}'.` |
-| **Writes declare no response body, but return one.** `POST /Books` and `PUT /Books/{id}` are documented as `200: {description: Success}` with no content, yet both echo the submitted book back. | `No response body is expected but one was found.` |
+| **Books writes declare no response body, but return one.** `POST /Books` and `PUT /Books/{id}` are documented as `200: {description: Success}` with no content, yet both echo the submitted book back. | `No response body is expected but one was found.` |
 
-Both are asserted **by name** in
+The gaps are asserted using a Books GET 404 and a Books POST response in
 [`TC_API_CONTRACT_01_OpenApiContract`](src/test/java/TS_API_Contract/TC_API_CONTRACT_01_OpenApiContract.java),
 the same way the statelessness of the API is. They are findings about the provider's
 documentation, not defects in this suite — and the day the provider corrects the
@@ -375,8 +376,8 @@ pointing here.
 ## Extending the framework
 
 **Adding a case to an endpoint already covered** — add a `@Test` to the matching
-class, or a row to its `@DataProvider`. Nothing else changes; the suites pick it up
-by package.
+class, or a row to its `@DataProvider`. The suites already include that class, so no
+suite change is needed. A new class must also be registered in `FULL_RUN.xml`.
 
 **Adding an endpoint to a resource already covered** — two edits:
 
@@ -452,24 +453,49 @@ And the assessment's other requirements:
 
 ## Test coverage
 
+Cases count individual data-provider rows as separate executions. They are not a
+code-coverage percentage or a count of assertions.
+
+| Folder | Test methods | Cases | What the scenarios protect |
+|---|---|---|---|
+| [`TS_API_Books`](src/test/java/TS_API_Books) | 33 | 63 | Catalogue reads, identity lookup, payload handling and write acknowledgments |
+| [`TS_API_Authors`](src/test/java/TS_API_Authors) | 33 | 56 | Author operations and the relationship between authors and books |
+| [`TS_API_Contract`](src/test/java/TS_API_Contract) | 4 | 4 | Snapshot freshness, response schema conformance and known documentation gaps |
+| [`TS_FRAMEWORK`](src/test/java/TS_FRAMEWORK) | 22 | 35 | Request isolation, retry limits, execution context, reporting, thread separation and schema validation |
+| **Total** | **92** | **158** | **123 API/contract cases and 35 framework cases** |
+
 ### Books
 
 | Endpoint | Happy path | Edge cases |
 |---|---|---|
-| `GET /Books` | Returns JSON, every book well-formed, within a response-time budget | Ids are unique; two consecutive reads return the same catalogue |
-| `GET /Books/{id}` | Ids 1, 50, 100, 200 each return their own book | `0`, `-1`, `9999`, `MAX_VALUE` → 404; `abc`, `1.5`, a space, `2147483648` → 400 naming `id` |
-| `POST /Books` | A valid book is accepted and echoed unchanged | Wrong field types (`$.id`, `$.pageCount`, `$.publishDate`) → 400; empty body, truncated JSON, a bare string → 400; 5 000-character text survives untruncated; the created book is not retrievable |
-| `PUT /Books/{id}` | An existing book is updated and echoed back | An unknown id is accepted anyway; non-integer id → 400; wrong field types → 400; the update is not persisted |
-| `DELETE /Books/{id}` | Acknowledged with an empty body | An unknown id is acknowledged too; non-integer id → 400; the deletion is not persisted |
+| `GET /Books` | Returns JSON matching the contract, every book well-formed, within a response-time budget; at least 200 records including IDs 1, 50, 100 and 200 | IDs are unique; two nonempty consecutive reads return the same IDs; collection `PATCH` → 405 |
+| `GET /Books/{id}` | IDs 1, 50, 100, 200 each return their own book | `0`, `-1`, `201`, `9999`, `MAX_VALUE` → 404; `abc`, `1.5`, a space, `2147483648` → 400 naming `id`; item `PATCH` → 405 |
+| `POST /Books` | A valid book is accepted and echoed unchanged | Wrong field types and individually null `id`, `pageCount`, `publishDate` → 400; empty body, truncated JSON and a bare string → 400; text/plain and XML → 415; 5,000-character text, Unicode and escaping survive; a non-UTC date retains its instant; defaults, negative page count acceptance and absent persistence are characterised |
+| `PUT /Books/{id}` | An update is acknowledged and echoed back | Non-integer IDs, wrong page-count type, individually null numeric/date fields and unusable bodies → 400; text/plain and XML → 415; unknown IDs are accepted; the body's ID wins over the path's; the update is not persisted |
+| `DELETE /Books/{id}` | Acknowledged with an empty body matching the contract | An unknown ID is acknowledged too; non-integer ID → 400; the deleted ID still returns the same book identity |
+
+Boundary values distinguish a valid integer with no matching record from an ID that
+cannot bind to an integer. Null-field cases isolate one invalid field at a time, so
+one rejection cannot conceal missing validation on another field. Long text checks
+truncation; fixed CJK, emoji, right-to-left, quote, backslash and whitespace inputs
+check encoding and escaping. These are representative inputs, not an exhaustive
+search for payload limits.
 
 ### Framework
 
 | Check | Covered |
 |---|---|
 | Request isolation | A content-type override does not leak into the next request; each call gets its own specification |
-| Retry policy | 13 failure shapes, transient and deterministic, each asserted to the right decision |
-| Execution context | One context per test; a step description is delivered once then cleared |
+| Retry policy | 14 failure shapes, including 502; wrapped timeouts; the analyzer stops at the configured attempt budget and refuses a deterministic failure |
+| Execution context | The service and transport share a context; a step description is delivered once then cleared; an absent description is handled |
 | Execution summary | Fail-then-pass reports as flaky and keeps the evidence; elapsed and cumulative time are distinguished |
+| Thread isolation | Two threads receive different services and contexts; a request path recorded on one is absent on the other |
+| Contract validation | An in-memory malformed response produces violations; a valid response produces none |
+
+These cases protect the reliability of the test results themselves. The thread tests
+exercise separation between threads, not cleanup when a worker thread is reused.
+The schema tests exercise violation collection; they do not yet assert that
+`verifyMatchesContract()` throws for a malformed response.
 
 ### Contract
 
@@ -481,21 +507,25 @@ And the assessment's other requirements:
 
 ### Authors (bonus)
 
-Covered to the same depth as Books — one class per endpoint, 48 checks.
+One class per endpoint, 56 cases. Authors share the core validation scenarios with
+Books and add relationship checks. The fixed Unicode and date-offset cases are
+currently specific to Books.
 
 | Endpoint | Happy path | Edge cases |
 |---|---|---|
 | `GET /Authors` | Returns JSON, every author well-formed, within a response-time budget, matches the contract | Ids are unique; every author attributed to a book in the catalogue, and within the 1–200 range; two consecutive reads both return well-formed collections; `PATCH` → 405 |
-| `GET /Authors/{id}` | Ids 1, 50, 100, 200 each return their own author | `0`, `-1`, `999999`, `MAX_VALUE` → 404; `abc`, `1.5`, a space, `2147483648` → 400 naming `id` |
+| `GET /Authors/{id}` | Ids 1, 50, 100, 200 each return their own author | `0`, `-1`, `999999`, `MAX_VALUE` → 404; `abc`, `1.5`, a space, `2147483648` → 400 naming `id`; item `PATCH` → 405 |
 | `POST /Authors` | A valid author is accepted and echoed unchanged | Wrong field types (`$.id`, `$.idBook`, `$.firstName`) → 400; `id` and `idBook` each rejected on their own when null; empty body, truncated JSON, a bare string → 400; `text/plain` and XML → 415; 5 000-character names survive untruncated; an empty object is filled with defaults; **an author may reference a book that does not exist**; the created author is not retrievable |
-| `PUT /Authors/{id}` | An existing author is updated and echoed back | Non-integer id → 400; wrong field types → 400; an unknown id is accepted anyway; **the body's id wins over the path's**; the update is not persisted |
+| `PUT /Authors/{id}` | An update is acknowledged and echoed back, matching the contract | Non-integer IDs, wrong book-reference type, individually null `id`/`idBook` and unusable bodies → 400; text/plain and XML → 415; an unknown ID is accepted; **the body's ID wins over the path's**; the update is not persisted |
 | `DELETE /Authors/{id}` | Acknowledged with an empty body, matches the contract | Non-integer id → 400; an unknown id is acknowledged too; the deletion is not persisted |
 
-Two of those are findings rather than checks, both tagged `provider-behaviour`:
+Two relationship and identity findings are tagged `provider-behaviour`:
 `idBook` is the only relationship this API models and **nothing enforces it** — an
 author can be attributed to book 999999 — and `PUT` silently honours the id in the
-body over the one in the path, so a client trusting the path writes to the wrong
-record. Books behaves the same way on the second point.
+body over the one in the path. This establishes which identity is echoed, not a write
+to a stored record. Books behaves the same way on the second point. Comparing valid
+seeded relationships with accepted dangling references shows why clean sample data
+does not prove relationship enforcement on writes.
 
 ---
 
@@ -533,34 +563,34 @@ build means one thing.
 
 | Event | What runs | Checks | Blocks a merge? |
 |---|---|---|---|
-| **Pull request** | Static analysis · framework tests · `SMOKE_RUN` | 28 + 10 | **Yes** |
-| **Push to `main`** | Static analysis · framework tests · regression `-DexcludedGroups=provider-behaviour` | 28 + 81 | **Yes** |
-| **Nightly, 06:00** | Everything, provider characterisation included | 28 + 99 | No — reports |
+| **Pull request** | Static analysis · framework tests · `SMOKE_RUN` | 35 + 10 | **Yes** |
+| **Push to `main`** | Static analysis · framework tests · regression `-DexcludedGroups=provider-behaviour` | 35 + 105 | **Yes** |
+| **Nightly, 06:00** | Everything, provider characterisation included | 35 + 123 | No — reports |
 | **Monday, 03:00** | Dependency audit, on its own clock | — | Yes, its own job |
 | **On demand** | A chosen suite, optionally with the audit | varies | — |
 
 Why the lanes fall there:
 
-- **The framework tests gate everything and reach nothing.** 28 checks, about a
-  second. They open no socket at all: the one test that needs to inspect an outgoing
-  request captures it with a Rest Assured filter and answers it in memory, and its
-  base URI is `bookstore.invalid`, an unresolvable name — so a pass is proof nothing
-  was transmitted. A failure there is
+- **The framework tests gate everything and reach nothing.** 35 cases, about a
+  second. Tests that dispatch requests use Rest Assured filters to capture or answer
+  them in memory without forwarding to the network, with `bookstore.invalid` as
+  their base URI. A failure there is
   unambiguously this repository's fault, which is what a merge gate should mean.
 - **A pull request runs smoke, not the full suite.** Ten checks catch a broken
-  request before it merges; running all 99 would make every pull request depend on a
+  request before it merges; running all 123 would make every pull request depend on a
   free-tier sandbox being awake.
-- **`main` runs 81, not 99.** The 18 excluded are `provider-behaviour` — they pin
+- **`main` runs 105 of the 123 API cases.** The 18 excluded are `provider-behaviour` — they pin
   what FakeRestAPI does *today*. If the provider completes their OpenAPI document
   tomorrow, those go red. A test that fails because a third party improved must never
   block somebody's merge.
-- **The nightly runs all 99 and only reports.** Nothing is being merged at 06:00, so
+- **The nightly runs all 123 API cases.** Nothing is being merged at 06:00, so
   that is exactly where you want to hear that the provider changed something.
 
-Every lane generates the Allure report **even when the suite is red**, writes the
+The API job generates the Allure report **even when the suite is red**, writes the
 Markdown summary onto the run page, and uploads the report, the summary and the raw
-results. Publishing to Pages happens on `main` only, so a pull request cannot
-overwrite what is published.
+results. The framework job uploads its summary and raw results separately.
+Publishing to Pages happens on `main` only, so a pull request cannot overwrite what
+is published.
 
 A [`Jenkinsfile`](Jenkinsfile) mirrors the same lanes — static analysis, framework
 tests, API tests, then the audit — for a Jenkins controller. The
@@ -590,8 +620,16 @@ Worth stating plainly, because each one shaped a decision in this suite:
 - **Writes do not persist.** The service validates and echoes; it stores nothing. See
   [what the service actually guarantees](#what-the-service-under-test-actually-guarantees).
 - **The contract is the provider's, and it is incomplete.** No error responses are
-  documented, and writes declare no response body while returning one. Both are
+  documented, and Books writes declare no response body while returning one. Both are
   [recorded as findings](#two-findings-about-the-published-document).
+- **Collection membership is sampled.** The Books collection must contain at least
+  200 records and the four read-only IDs under test; this does not prove every seeded
+  ID from 1 to 200 is present. The Authors deletion persistence check verifies a
+  subsequent 200 response, but does not yet assert the returned author's ID.
+- **Summary aggregation has an equal-timestamp edge case.** If failed and successful
+  attempts have the same end timestamp, their merge order can change the reported
+  verdict between failed and flaky. The current order-independence test uses different
+  timestamps for failure and success and does not cover this boundary.
 - **The target is a shared public sandbox** on free-tier hosting. It cold-starts, and
   occasionally times out. Hence the generous response-time budget and the retry policy
   limited to transient failures.
@@ -609,14 +647,13 @@ Worth stating plainly, because each one shaped a decision in this suite:
 | Symptom | Cause and fix |
 |---|---|
 | Only the API results appear in the Allure report | The two lanes share a results directory and only the first `clean` is intended. `./run-tests.sh` cleans once at the start and runs both lanes without cleaning between them; a manual `./mvnw clean test` between them discards the first lane's results. |
-| Tests fail with connection or 5xx errors across the board | The public sandbox is down or cold-starting. Check <https://fakerestapi.azurewebsites.net/api/v1/Books> in a browser. The suite already retries 3× per test; if it is genuinely down, there is nothing to fix on this side. |
+| Tests fail with connection or 5xx errors across the board | Check the configured URL and <https://fakerestapi.azurewebsites.net/api/v1/Books>; the public sandbox may be down or cold-starting. Eligible transient failures get up to three total attempts. A plain 500 is not retried. |
 | `cannot find symbol: method getId()` and similar on every DTO | Lombok is not running. From JDK 23 javac no longer picks annotation processors off the classpath; the POM declares Lombok under `annotationProcessorPaths` to handle this. If you changed the compiler configuration, put it back. |
 | The Allure report has no steps, and the log mentions `Unsupported class file major version` | AspectJ cannot weave on your JDK. Bump `aspectj.version` in the POM; Allure's `@Step` support depends on it. |
 | `Detected JDK version ... is not in the allowed range [21,)` | The enforcer doing its job. `./mvnw` uses `JAVA_HOME`, which may differ from the JDK your `mvn` uses. Set `JAVA_HOME` to a JDK 21+ installation. |
 | The build fails in `validate` with a Spotless or Checkstyle error | Formatting or static analysis, not a test failure. Run `./mvnw spotless:apply`; for Checkstyle the message names the file, line and rule. |
 | `./mvnw test` runs zero tests | `-Dtest=` or `-Dgroups=` matched nothing. Group names are listed under [Groups](#groups); class names under [Test coverage](#test-coverage). |
 | The report is not where the README says | Reports are written relative to the working directory. Run Maven from the repository root. |
-| `local` profile fails to connect | The `local` profile points at `http://localhost:8080` and expects you to be hosting a copy of the API there. Use `-Pdev` for the public sandbox. |
 
 ---
 
@@ -664,9 +701,11 @@ Generated values are seeded and the seed is printed at the start of every run:
 Generated test data uses seed -5970878229670656902. Replay this run with -Ddata.seed=-5970878229670656902
 ```
 
-Random data finds what fixed data does not, but only if a failure can be reproduced.
+Reusing the seed helps reproduce generated values, but does not guarantee the exact
+payload for a particular test: parallel classes share factory generators, and dates
+come from the clock. Inspect the request attachment when investigating a failure.
 Generated ids start at `100_000`, well above the 200 seeded books, so a generated book
-can never collide with real data. Publish dates are truncated to whole seconds because
+does not collide with the current seeded catalogue. Publish dates are truncated to whole seconds because
 the API drops sub-second precision when it echoes a payload back, which would
 otherwise fail an equality assertion for a reason that is not a defect.
 

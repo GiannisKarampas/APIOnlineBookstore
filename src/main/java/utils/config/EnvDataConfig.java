@@ -14,8 +14,8 @@ import utils.enums.Environment;
 /**
  * Reads the settings of the environment the run was started against.
  * <p>
- * Which file that is comes from the active Maven profile, so switching environment
- * is {@code -Plocal} and never a code change.
+ * Which file that is comes from the active Maven profile, so adding an environment
+ * is a properties file and a profile, never a code change.
  */
 public class EnvDataConfig {
 
@@ -72,14 +72,6 @@ public class EnvDataConfig {
      */
     public int getSocketTimeoutInMillis() {
         return readInt("http.socket.timeout.millis", 30_000);
-    }
-
-    /**
-     * Whether this environment may accept certificates that do not validate. False
-     * everywhere it is not explicitly turned on.
-     */
-    public boolean isRelaxedTlsAllowed() {
-        return Boolean.parseBoolean(getEnvProperties().getProperty("tls.relaxed", "false"));
     }
 
     private int readInt(String key, int fallback) {

@@ -1,6 +1,7 @@
 package TS_API_Books;
 
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
+import static org.apache.http.HttpStatus.SC_METHOD_NOT_ALLOWED;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.testng.Assert.assertEquals;
@@ -43,12 +44,17 @@ public class TC_API_BOOKS_02_GetBookById extends BookstoreTest {
     }
 
     /**
-     * Ids that are syntactically valid integers but match no book. Zero and negative
-     * values are included because an off-by-one in the lookup would surface here.
+     * Ids that are syntactically valid integers but match no book.
+     * <p>
+     * {@code 0} and {@code -1} sit immediately below the seeded range and {@code 201}
+     * immediately above it, so an off-by-one at either edge surfaces here. The larger
+     * values are the same equivalence class further out, with {@code MAX_VALUE} kept
+     * as the partner to {@code 2147483648} below: one binds to an int and misses the
+     * lookup, the next cannot bind at all.
      */
     @DataProvider(name = "unknownBookIds")
     public Object[][] unknownBookIds() {
-        return new Object[][]{{0}, {-1}, {9_999}, {Integer.MAX_VALUE}};
+        return new Object[][]{{0}, {-1}, {201}, {9_999}, {Integer.MAX_VALUE}};
     }
 
     /**
@@ -102,6 +108,17 @@ public class TC_API_BOOKS_02_GetBookById extends BookstoreTest {
 
         books("Verify the API reports the book as not found").validate(checks -> checks
                     .verifyStatusCode(SC_NOT_FOUND));
+    }
+
+    @Severity(SeverityLevel.MINOR)
+    @Test(groups = {REGRESSION, BOOKS, EDGE_CASE},
+            description = "A method this resource does not support is refused with 405")
+    public void anUnsupportedMethodIsRefused() {
+        books("Send PATCH to book " + Books.FIRST + ", which the API does not implement")
+                .patchBook(Books.FIRST, "{}");
+
+        books("Verify the method is refused").validate(checks -> checks
+                    .verifyStatusCode(SC_METHOD_NOT_ALLOWED));
     }
 
     @Severity(SeverityLevel.MINOR)

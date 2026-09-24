@@ -46,6 +46,11 @@ public final class AuthorAssertions {
 
     @Step("Verify the ids are unique")
     public static void assertIdsAreUnique(List<AuthorDTO> authors) {
+        // An empty collection satisfies uniqueness trivially (0 == 0), so the check
+        // would pass on the one response that most deserves to fail it.
+        assertNotNull(authors, "Expected a collection of authors but got nothing.");
+        assertFalse(authors.isEmpty(), "An empty collection cannot demonstrate unique ids.");
+
         Set<Integer> uniqueIds = authors.stream().map(AuthorDTO::getId).collect(Collectors.toSet());
         assertEquals(uniqueIds.size(), authors.size(), "The API returned duplicate author ids.");
     }

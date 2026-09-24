@@ -2,6 +2,7 @@ package TS_API_Books;
 
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 import static org.apache.http.HttpStatus.SC_OK;
+import static org.apache.http.HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
@@ -21,6 +22,7 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Severity;
 import io.qameta.allure.SeverityLevel;
 import io.qameta.allure.Story;
+import io.restassured.http.ContentType;
 import models.errors.ProblemDetailsDTO;
 import services.rest.books.BookAssertions;
 import services.rest.books.BookDTO;
@@ -45,8 +47,8 @@ public class TC_API_BOOKS_04_UpdateBook extends BookstoreTest {
 
     @Severity(SeverityLevel.CRITICAL)
     @Test(groups = {SMOKE, REGRESSION, BOOKS, HAPPY_PATH},
-            description = "An existing book is updated and the new version is echoed back")
-    public void anExistingBookIsUpdated() {
+            description = "An update to an existing book is acknowledged and echoed back")
+    public void anUpdateToAnExistingBookIsAcknowledged() {
         BookDTO update = BookFactory.aBookWithId(A_SEEDED_BOOK_ID);
 
         books("Update book " + A_SEEDED_BOOK_ID + " with a new title and page count").updateBook(A_SEEDED_BOOK_ID, update);
@@ -143,6 +145,74 @@ public class TC_API_BOOKS_04_UpdateBook extends BookstoreTest {
 
         assertTrue(problem.getErrors().containsKey("id"),
                 "The problem document should name 'id' as the offending field but reported: " + problem.getErrors());
+    }
+
+    /**
+     * The same bodies POST refuses. A passing POST says nothing about PUT: they are
+     * separate routes and can bind their bodies differently.
+     */
+    @DataProvider(name = "unusableBodies")
+    public Object[][] unusableBodies() {
+        return new Object[][]{
+                {"an empty body", ""},
+                {"truncated JSON", "{\"id\":"},
+                {"a bare string", "\"just a string\""},
+        };
+    }
+
+    @DataProvider(name = "nonNullableFields")
+    public Object[][] nonNullableFields() {
+        return new Object[][]{
+                {"id", "{\"id\":null,\"title\":\"A title\",\"pageCount\":1,\"publishDate\":\"2026-01-01T00:00:00Z\"}"},
+                {"pageCount", "{\"id\":1,\"title\":\"A title\",\"pageCount\":null,\"publishDate\":\"2026-01-01T00:00:00Z\"}"},
+                {"publishDate", "{\"id\":1,\"title\":\"A title\",\"pageCount\":1,\"publishDate\":null}"},
+        };
+    }
+
+    @DataProvider(name = "unacceptableContentTypes")
+    public Object[][] unacceptableContentTypes() {
+        return new Object[][]{{"plain text", ContentType.TEXT}, {"XML", ContentType.XML}};
+    }
+
+    @Severity(SeverityLevel.MINOR)
+    @Test(dataProvider = "unusableBodies",
+            groups = {REGRESSION, BOOKS, EDGE_CASE},
+            description = "An update whose body is not a book object is rejected")
+    public void anUnusableBodyIsRejected(String scenario, String body) {
+        books("Update book " + A_SEEDED_BOOK_ID + " with " + scenario)
+                .updateBookFromRawPayload(A_SEEDED_BOOK_ID, body);
+
+        books("Verify the request is rejected with a problem document").validate(checks -> checks
+                    .verifyProblemDetails(SC_BAD_REQUEST));
+    }
+
+    @Severity(SeverityLevel.MINOR)
+    @Test(dataProvider = "nonNullableFields",
+            groups = {REGRESSION, BOOKS, EDGE_CASE},
+            description = "Each non-nullable field is rejected on its own when an update sends it as null")
+    public void aNullNonNullableFieldIsRejected(String field, String payload) {
+        books("Update book " + A_SEEDED_BOOK_ID + " with a null " + field)
+                .updateBookFromRawPayload(A_SEEDED_BOOK_ID, payload);
+
+        ProblemDetailsDTO problem = books("Verify the request is rejected").validate(checks -> checks
+                    .verifyProblemDetails(SC_BAD_REQUEST));
+
+        assertTrue(problem.getErrors().containsKey("$." + field),
+                "Expected the problem document to blame $." + field + " on its own, but it reported: "
+                        + problem.getErrors());
+    }
+
+    @Severity(SeverityLevel.MINOR)
+    @Test(dataProvider = "unacceptableContentTypes",
+            groups = {REGRESSION, BOOKS, EDGE_CASE},
+            description = "An update sent under a media type the API does not accept is refused")
+    public void anUnsupportedMediaTypeIsRefused(String scenario, ContentType contentType) {
+        books("Update book " + A_SEEDED_BOOK_ID + " as " + scenario)
+                .updateBookWithContentType(A_SEEDED_BOOK_ID, contentType,
+                        "{\"id\":1,\"title\":\"A title\",\"pageCount\":1}");
+
+        books("Verify the API refuses the media type").validate(checks -> checks
+                    .verifyStatusCode(SC_UNSUPPORTED_MEDIA_TYPE));
     }
 
     @Severity(SeverityLevel.MINOR)

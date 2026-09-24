@@ -56,6 +56,13 @@ public class AuthorsService extends ApiService {
     }
 
     /**
+     * Sends a PATCH to the collection, which this API does not implement.
+     */
+    public Response patchAuthors(String rawPayload) {
+        return rest.patchRequest(AUTHORS, "", rawPayload);
+    }
+
+    /**
      * Sends a PATCH, which this API does not implement, to check it is refused.
      */
     public Response patchAuthor(int authorId, String rawPayload) {
@@ -71,6 +78,13 @@ public class AuthorsService extends ApiService {
      */
     public Response updateAuthorWithRawId(String rawAuthorId, AuthorDTO author) {
         return rest.putRequest(AUTHOR_BY_ID, "", author, ID, rawAuthorId);
+    }
+
+    /**
+     * Updates an author under a content type of the caller's choosing.
+     */
+    public Response updateAuthorWithContentType(int authorId, ContentType contentType, String rawPayload) {
+        return rest.putRequest(AUTHOR_BY_ID, "", rawPayload, contentType, ID, authorId);
     }
 
     /**

@@ -1,6 +1,7 @@
 package TS_API_Authors;
 
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
+import static org.apache.http.HttpStatus.SC_METHOD_NOT_ALLOWED;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.testng.Assert.assertEquals;
@@ -103,6 +104,17 @@ public class TC_API_AUTHORS_02_GetAuthorById extends BookstoreTest {
 
         authors("Verify the API reports the author as not found").validate(checks -> checks
                 .verifyStatusCode(SC_NOT_FOUND));
+    }
+
+    @Severity(SeverityLevel.MINOR)
+    @Test(groups = {REGRESSION, AUTHORS, EDGE_CASE},
+            description = "A method this resource does not support is refused with 405")
+    public void anUnsupportedMethodIsRefused() {
+        authors("Send PATCH to author " + Authors.FIRST + ", which the API does not implement")
+                .patchAuthor(Authors.FIRST, "{}");
+
+        authors("Verify the method is refused").validate(checks -> checks
+                .verifyStatusCode(SC_METHOD_NOT_ALLOWED));
     }
 
     @Severity(SeverityLevel.MINOR)

@@ -133,8 +133,25 @@ public class Rest implements IRestService {
         return putRequest(requestSpec, basePath, route, body, Map.of(pathParameterName, pathParameterValue), null, null);
     }
 
+    /**
+     * Puts under a content type other than the JSON default. Builds a fresh
+     * specification for the same reason {@link #postRequest} does.
+     */
+    public Response putRequest(IEndpoint basePath, String route, Object body, ContentType contentType,
+                               String pathParameterName, Object pathParameterValue) {
+        return putRequest(getRequestSpec(contentType), basePath, route, body,
+                Map.of(pathParameterName, pathParameterValue), null, null);
+    }
+
     public Response deleteRequest(IEndpoint basePath, String route, String pathParameterName, Object pathParameterValue) {
         return deleteRequest(requestSpec, basePath, route, null, Map.of(pathParameterName, pathParameterValue), null, null);
+    }
+
+    /**
+     * Sends a PATCH at a collection endpoint, which takes no path parameter.
+     */
+    public Response patchRequest(IEndpoint basePath, String route, Object body) {
+        return sendRequest(createRequest(requestSpec, basePath, route, body, null, null, null), Method.PATCH, route);
     }
 
     /**
@@ -247,7 +264,10 @@ public class Rest implements IRestService {
      * cannot affect anybody else's request.
      */
     public RequestSpecification getRequestSpec() {
-        RequestSpecBuilder builder = new RequestSpecBuilder()
+        // Certificates must validate, in every environment. Nothing here relaxes TLS:
+        // a suite that accepts any certificate cannot tell a correctly served API from
+        // one behind a broken or substituted one.
+        return new RequestSpecBuilder()
                 .setBaseUri(baseUri)
                 .setContentType(JSON)
                 // Stated rather than left as */*: these tests are about the JSON
@@ -260,16 +280,8 @@ public class Rest implements IRestService {
                 .log(LogDetail.URI)
                 .log(LogDetail.HEADERS)
                 .log(LogDetail.PARAMS)
-                .log(LogDetail.BODY);
-
-        // Off by default. Accepting any certificate would mean a test cannot tell a
-        // correctly served API from one behind a broken or substituted one, so it is
-        // opted into per environment and only where a self-signed certificate is
-        // genuinely expected.
-        if (envDataConfig.isRelaxedTlsAllowed()) {
-            builder.setRelaxedHTTPSValidation();
-        }
-        return builder.build();
+                .log(LogDetail.BODY)
+                .build();
     }
 
     /**

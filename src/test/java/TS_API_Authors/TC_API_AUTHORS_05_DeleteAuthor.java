@@ -41,8 +41,8 @@ public class TC_API_AUTHORS_05_DeleteAuthor extends BookstoreTest {
 
     @Severity(SeverityLevel.CRITICAL)
     @Test(groups = {SMOKE, REGRESSION, AUTHORS, HAPPY_PATH},
-            description = "Deleting an existing author is acknowledged with an empty body")
-    public void anExistingAuthorIsDeleted() {
+            description = "A deletion of an existing author is acknowledged with an empty body")
+    public void aDeletionOfAnExistingAuthorIsAcknowledged() {
         authors("Delete author " + A_SEEDED_AUTHOR_ID).deleteAuthor(A_SEEDED_AUTHOR_ID);
 
         authors("Verify the deletion is acknowledged without a body").validate(checks -> checks

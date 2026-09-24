@@ -2,6 +2,7 @@ package TS_API_Authors;
 
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 import static org.apache.http.HttpStatus.SC_OK;
+import static org.apache.http.HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
@@ -21,6 +22,7 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Severity;
 import io.qameta.allure.SeverityLevel;
 import io.qameta.allure.Story;
+import io.restassured.http.ContentType;
 import models.errors.ProblemDetailsDTO;
 import services.rest.authors.AuthorAssertions;
 import services.rest.authors.AuthorDTO;
@@ -45,8 +47,8 @@ public class TC_API_AUTHORS_04_UpdateAuthor extends BookstoreTest {
 
     @Severity(SeverityLevel.CRITICAL)
     @Test(groups = {SMOKE, REGRESSION, AUTHORS, HAPPY_PATH},
-            description = "An existing author is updated and the new version is echoed back")
-    public void anExistingAuthorIsUpdated() {
+            description = "An update to an existing author is acknowledged and echoed back")
+    public void anUpdateToAnExistingAuthorIsAcknowledged() {
         AuthorDTO update = AuthorFactory.anAuthorWithId(A_SEEDED_AUTHOR_ID);
 
         authors("Update author " + A_SEEDED_AUTHOR_ID).updateAuthor(A_SEEDED_AUTHOR_ID, update);
@@ -75,6 +77,69 @@ public class TC_API_AUTHORS_04_UpdateAuthor extends BookstoreTest {
         assertTrue(problem.getErrors().containsKey("id"),
                 "The problem document should name 'id' as the offending field but reported: "
                         + problem.getErrors());
+    }
+
+    @DataProvider(name = "unusableBodies")
+    public Object[][] unusableBodies() {
+        return new Object[][]{
+                {"an empty body", ""},
+                {"truncated JSON", "{\"id\":"},
+                {"a bare string", "\"just a string\""},
+        };
+    }
+
+    @DataProvider(name = "nonNullableFields")
+    public Object[][] nonNullableFields() {
+        return new Object[][]{
+                {"id", "{\"id\":null,\"idBook\":1,\"firstName\":\"Ada\",\"lastName\":\"Lovelace\"}"},
+                {"idBook", "{\"id\":1,\"idBook\":null,\"firstName\":\"Ada\",\"lastName\":\"Lovelace\"}"},
+        };
+    }
+
+    @DataProvider(name = "unacceptableContentTypes")
+    public Object[][] unacceptableContentTypes() {
+        return new Object[][]{{"plain text", ContentType.TEXT}, {"XML", ContentType.XML}};
+    }
+
+    @Severity(SeverityLevel.MINOR)
+    @Test(dataProvider = "unusableBodies",
+            groups = {REGRESSION, AUTHORS, EDGE_CASE},
+            description = "An update whose body is not an author object is rejected")
+    public void anUnusableBodyIsRejected(String scenario, String body) {
+        authors("Update author " + A_SEEDED_AUTHOR_ID + " with " + scenario)
+                .updateAuthorFromRawPayload(A_SEEDED_AUTHOR_ID, body);
+
+        authors("Verify the request is rejected with a problem document").validate(checks -> checks
+                .verifyProblemDetails(SC_BAD_REQUEST));
+    }
+
+    @Severity(SeverityLevel.MINOR)
+    @Test(dataProvider = "nonNullableFields",
+            groups = {REGRESSION, AUTHORS, EDGE_CASE},
+            description = "Each non-nullable field is rejected on its own when an update sends it as null")
+    public void aNullNonNullableFieldIsRejected(String field, String payload) {
+        authors("Update author " + A_SEEDED_AUTHOR_ID + " with a null " + field)
+                .updateAuthorFromRawPayload(A_SEEDED_AUTHOR_ID, payload);
+
+        ProblemDetailsDTO problem = authors("Verify the request is rejected").validate(checks -> checks
+                .verifyProblemDetails(SC_BAD_REQUEST));
+
+        assertTrue(problem.getErrors().containsKey("$." + field),
+                "Expected the problem document to blame $." + field + " on its own, but it reported: "
+                        + problem.getErrors());
+    }
+
+    @Severity(SeverityLevel.MINOR)
+    @Test(dataProvider = "unacceptableContentTypes",
+            groups = {REGRESSION, AUTHORS, EDGE_CASE},
+            description = "An update sent under a media type the API does not accept is refused")
+    public void anUnsupportedMediaTypeIsRefused(String scenario, ContentType contentType) {
+        authors("Update author " + A_SEEDED_AUTHOR_ID + " as " + scenario)
+                .updateAuthorWithContentType(A_SEEDED_AUTHOR_ID, contentType,
+                        "{\"id\":1,\"idBook\":1,\"firstName\":\"Ada\"}");
+
+        authors("Verify the API refuses the media type").validate(checks -> checks
+                .verifyStatusCode(SC_UNSUPPORTED_MEDIA_TYPE));
     }
 
     @Severity(SeverityLevel.MINOR)

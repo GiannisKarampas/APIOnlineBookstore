@@ -3,6 +3,7 @@ package TS_API_Authors;
 import static org.apache.http.HttpStatus.SC_METHOD_NOT_ALLOWED;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static utils.TestGroups.AUTHORS;
 import static utils.TestGroups.EDGE_CASE;
@@ -23,7 +24,6 @@ import io.qameta.allure.Story;
 import services.rest.authors.AuthorAssertions;
 import services.rest.authors.AuthorDTO;
 import services.rest.books.BookDTO;
-import utils.data.SeededCatalogue.Authors;
 
 /**
  * GET /api/v1/Authors - retrieving the whole author list.
@@ -45,8 +45,8 @@ public class TC_API_AUTHORS_01_GetAllAuthors extends BookstoreTest {
                 .validate(checks -> checks
                         .verifyStatusCode(SC_OK)
                         .verifyContentTypeIsJson()
-                        .verifyResponseTimeIsBelow(RESPONSE_TIME_BUDGET_IN_MILLIS)
                         .verifyMatchesContract()
+                        .verifyResponseTimeIsBelow(RESPONSE_TIME_BUDGET_IN_MILLIS)
                         .asListOf(AuthorDTO.class));
 
         AuthorAssertions.assertAllMeetSeededExpectations(allAuthors);
@@ -107,8 +107,9 @@ public class TC_API_AUTHORS_01_GetAllAuthors extends BookstoreTest {
         // Unlike the book catalogue, this collection is regenerated per call and its
         // length varies, so the ids cannot be compared. What must hold is that a
         // read-only endpoint keeps returning a well-formed, non-empty collection.
-        assertTrue(secondRead.size() > 0 && firstRead.size() > 0,
-                "A read-only endpoint returned an empty collection on one of two consecutive calls.");
+        assertFalse(firstRead.isEmpty(), "The author list was empty on the first read.");
+        assertFalse(secondRead.isEmpty(), "The author list was empty on the second read.");
+        AuthorAssertions.assertAllMeetSeededExpectations(firstRead);
         AuthorAssertions.assertAllMeetSeededExpectations(secondRead);
     }
 
@@ -116,8 +117,8 @@ public class TC_API_AUTHORS_01_GetAllAuthors extends BookstoreTest {
     @Test(groups = {REGRESSION, AUTHORS, EDGE_CASE},
             description = "A method the resource does not support is refused with 405")
     public void anUnsupportedMethodIsRefused() {
-        authors("Send PATCH to an author, which the API does not implement")
-                .patchAuthor(Authors.FIRST, "{}");
+        authors("Send PATCH to the author list, which the API does not implement")
+                .patchAuthors("{}");
 
         authors("Verify the method is refused").validate(checks -> checks
                 .verifyStatusCode(SC_METHOD_NOT_ALLOWED));

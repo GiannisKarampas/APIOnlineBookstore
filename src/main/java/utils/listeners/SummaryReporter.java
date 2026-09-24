@@ -4,12 +4,13 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -38,7 +39,16 @@ import utils.listeners.report.TestCaseResult;
 public class SummaryReporter implements IReporter {
 
     private static final Path REPORT_DIRECTORY = Path.of("test-results", "summary");
-    private static final DateTimeFormatter TIMESTAMP = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    /**
+     * Carries the offset and the zone, because the same report is generated on a
+     * developer's machine and on a CI runner in UTC. Without them the two are
+     * indistinguishable and a reader cannot tell which one they are holding.
+     * <p>
+     * {@link Locale#ROOT} for the same reason the totals use it: the default locale
+     * would localise the rendering on a machine configured for another language.
+     */
+    private static final DateTimeFormatter TIMESTAMP =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss XXX (VV)", Locale.ROOT);
     private static final Logger LOGGER = LoggerFactory.getLogger(SummaryReporter.class);
 
     @Override
@@ -50,10 +60,13 @@ public class SummaryReporter implements IReporter {
         }
 
         RunTotals totals = RunTotals.of(testCases);
+        // Taken once: the HTML and the Markdown describe the same run, so they must
+        // not disagree about when it happened.
+        String executedAt = ZonedDateTime.now().format(TIMESTAMP);
         try {
             Files.createDirectories(REPORT_DIRECTORY);
-            write(REPORT_DIRECTORY.resolve("index.html"), renderHtml(testCases, totals));
-            write(REPORT_DIRECTORY.resolve("summary.md"), renderMarkdown(testCases, totals));
+            write(REPORT_DIRECTORY.resolve("index.html"), renderHtml(testCases, totals, executedAt));
+            write(REPORT_DIRECTORY.resolve("summary.md"), renderMarkdown(testCases, totals, executedAt));
             LOGGER.info("Execution summary written to {}", REPORT_DIRECTORY.toAbsolutePath());
         } catch (IOException e) {
             LOGGER.error("Could not write the execution summary.", e);
@@ -116,10 +129,10 @@ public class SummaryReporter implements IReporter {
         Files.writeString(file, content, StandardCharsets.UTF_8);
     }
 
-    private String renderMarkdown(List<TestCaseResult> testCases, RunTotals totals) {
+    private String renderMarkdown(List<TestCaseResult> testCases, RunTotals totals, String executedAt) {
         StringBuilder markdown = new StringBuilder();
         markdown.append("# Online Bookstore API - Test Execution Report\n\n")
-                .append("Executed at ").append(LocalDateTime.now().format(TIMESTAMP)).append("\n\n")
+                .append("Executed at ").append(executedAt).append("\n\n")
                 .append("| Total | Passed | Flaky | Failed | Skipped | Pass rate | Elapsed | Cumulative |\n")
                 .append("|---|---|---|---|---|---|---|---|\n")
                 .append("| ").append(totals.total()).append(" | ").append(totals.passed())
@@ -168,7 +181,7 @@ public class SummaryReporter implements IReporter {
      * because the embedded CSS is full of percent signs that a format string would
      * try to read as conversions.
      */
-    private String renderHtml(List<TestCaseResult> testCases, RunTotals totals) {
+    private String renderHtml(List<TestCaseResult> testCases, RunTotals totals, String executedAt) {
         String rows = testCases.stream().map(this::renderHtmlRow).collect(Collectors.joining("\n"));
 
         return """
@@ -235,7 +248,7 @@ public class SummaryReporter implements IReporter {
                 </body>
                 </html>
                 """
-                .replace("{{executedAt}}", LocalDateTime.now().format(TIMESTAMP))
+                .replace("{{executedAt}}", executedAt)
                 .replace("{{total}}", String.valueOf(totals.total()))
                 .replace("{{passed}}", String.valueOf(totals.passed()))
                 .replace("{{failed}}", String.valueOf(totals.failed()))
